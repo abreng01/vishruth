@@ -208,6 +208,52 @@
   }
   #amen-card-close:hover { color:#ffd060; }
 
+
+  /* ── Resident Profile Card ── */
+  #res-card {
+    position:fixed; right:-420px; top:50%; transform:translateY(-50%);
+    width:390px; background:#060d18; border:1px solid #ffd06033;
+    border-radius:8px 0 0 8px; padding:24px 22px; z-index:300;
+    transition:right .35s cubic-bezier(.4,0,.2,1);
+    box-shadow:-6px 0 40px #000c;
+    font-family:var(--ff-mono);
+    overflow-y:auto; max-height:90vh;
+  }
+  #res-card.open { right:0; }
+  #res-card-close {
+    position:absolute; top:12px; right:14px; background:none; border:none;
+    color:#2a5070; font-size:1.1rem; cursor:pointer; line-height:1;
+  }
+  #res-card-close:hover { color:#ffd060; }
+  #rc-avatar:hover #rc-avatar-hover { opacity:1 !important; }
+  #rc-avatar:hover { border-color:#ffd060 !important; }
+  .rc-label { font-size:.5rem; color:#2a5070; letter-spacing:.12em; text-transform:uppercase; margin-bottom:3px; }
+  .rc-value { font-size:.72rem; color:#c0d8f0; margin-bottom:12px; }
+  .rc-divider { border:none; border-top:1px solid #0a2030; margin:14px 0; }
+  .rc-link-btn {
+    display:flex; align-items:center; gap:10px;
+    background:#0a1420; border:1px solid #102030; border-radius:5px;
+    padding:10px 14px; cursor:pointer; transition:all .15s;
+    font-family:var(--ff-mono); text-align:left; width:100%; margin-bottom:8px;
+  }
+  .rc-link-btn:hover { border-color:#00d4ff55; background:#0a1e2e; }
+  .rc-link-btn .rc-link-icon { font-size:1.2rem; }
+  .rc-link-btn .rc-link-text { font-size:.62rem; color:#2a5070; }
+  .rc-link-btn .rc-link-title { font-size:.72rem; color:#00d4ff; font-weight:600; }
+  .rc-mini-floor {
+    background:#030810; border:1px solid #0a2030; border-radius:4px;
+    padding:10px; margin-bottom:12px; display:flex; flex-wrap:wrap;
+    gap:3px; justify-content:center;
+  }
+  .rc-mini-unit {
+    width:26px; height:20px; border-radius:2px; border:1px solid #102030;
+    background:#0a1420; display:flex; align-items:center; justify-content:center;
+    font-size:.42rem; color:#2a5070; font-family:var(--ff-mono);
+  }
+  .rc-mini-unit.rc-mini-active {
+    border-color:#ffd060; background:#ffd06022;
+    color:#ffd060; font-weight:700; box-shadow:0 0 6px #ffd06055;
+  }
   /* ── Directory tab ── */
   .dir-table { width:100%; border-collapse:collapse; font-family:var(--ff-mono); font-size:.65rem; }
   .dir-table th {
@@ -254,32 +300,32 @@
 </header>
 
 <nav class="tab-bar" role="tablist" aria-label="Plan views">
-  <button class="tab-btn active" onclick="switchTab('full', this)" role="tab">
+  <button class="tab-btn active" onclick="switchTab('full', this)" data-tab="full" role="tab">
     <span class="tab-icon">🗺</span>Full Layout
   </button>
-  <button class="tab-btn" onclick="switchTab('blocks', this)" role="tab">
+  <button class="tab-btn" onclick="switchTab('blocks', this)" data-tab="blocks" role="tab">
     <span class="tab-icon">🏢</span>Residential Blocks
   </button>
-  <button class="tab-btn" onclick="switchTab('amenities', this)" role="tab">
+  <button class="tab-btn" onclick="switchTab('amenities', this)" data-tab="amenities" role="tab">
     <span class="tab-icon">🌳</span>Amenities
   </button>
-  <button class="tab-btn" onclick="switchTab('security', this)" role="tab">
+  <button class="tab-btn" onclick="switchTab('security', this)" data-tab="security" role="tab">
     <span class="tab-icon">🛡</span>Security
   </button>
-  <button class="tab-btn" onclick="switchTab('floor', this)" role="tab">
+  <button class="tab-btn" onclick="switchTab('floor', this)" data-tab="floor" role="tab">
     <span class="tab-icon">🏗</span>Floor Layout
   </button>
-  <button class="tab-btn" onclick="switchTab('house', this)" role="tab">
+  <button class="tab-btn" onclick="switchTab('house', this)" data-tab="house" role="tab">
     <span class="tab-icon">🏠</span>House Layout
   </button>
-  <button class="tab-btn" onclick="switchTab('parking', this)" role="tab">
+  <button class="tab-btn" onclick="switchTab('parking', this)" data-tab="parking" role="tab">
     <span class="tab-icon">🚗</span>Parking
   </button>
 </nav>
 
 <div class="stats">
   <div class="stat"><div class="num">6
-  <button class="tab-btn" onclick="switchTab('directory', this)" role="tab">
+  <button class="tab-btn" onclick="switchTab('directory', this)" data-tab="directory" role="tab">
     <span class="tab-icon">👥</span>Directory
   </button></div><div class="lbl">Blocks</div></div>
   <div class="stat"><div class="num">1,200</div><div class="lbl">Units</div></div>
@@ -2461,12 +2507,12 @@
     <div style="background:#060d18;border:1px solid #102030;border-radius:6px;padding:14px 20px;display:flex;align-items:center;gap:14px;">
       <span style="font-family:var(--ff-mono);font-size:.62rem;color:#2a5070;text-transform:uppercase;letter-spacing:.12em;">Block</span>
       <div style="display:flex;gap:4px;" id="blockBtns">
-        <button class="blk-btn active" onclick="flSelectBlock('B1',this)">B1</button>
-        <button class="blk-btn" onclick="flSelectBlock('B2',this)">B2</button>
-        <button class="blk-btn" onclick="flSelectBlock('B3',this)">B3</button>
-        <button class="blk-btn" onclick="flSelectBlock('B4',this)">B4</button>
-        <button class="blk-btn" onclick="flSelectBlock('B5',this)">B5</button>
-        <button class="blk-btn" onclick="flSelectBlock('B6',this)">B6</button>
+        <button class="blk-btn active" onclick="flSelectBlock('B1',this)" data-block="B1">B1</button>
+        <button class="blk-btn" onclick="flSelectBlock('B2',this)" data-block="B2">B2</button>
+        <button class="blk-btn" onclick="flSelectBlock('B3',this)" data-block="B3">B3</button>
+        <button class="blk-btn" onclick="flSelectBlock('B4',this)" data-block="B4">B4</button>
+        <button class="blk-btn" onclick="flSelectBlock('B5',this)" data-block="B5">B5</button>
+        <button class="blk-btn" onclick="flSelectBlock('B6',this)" data-block="B6">B6</button>
       </div>
     </div>
     <!-- Floor selector -->
@@ -2756,13 +2802,21 @@
 
   <!-- Search & filter -->
   <div class="dir-search-bar">
-    <input id="dir-search" type="text" placeholder="Search by name, unit, block, floor…" oninput="dirFilter()" />
-    <select id="dir-block-filter" onchange="dirFilter()" style="background:#0a1420;border:1px solid #102030;color:#c0d8f0;font-family:var(--ff-mono);font-size:.65rem;padding:7px 10px;border-radius:4px;cursor:pointer;">
+    <input id="dir-search" type="text" placeholder="Search by name, unit, block, floor…" oninput="dirCurrentPage=1;dirFilter()" />
+    <select id="dir-block-filter" onchange="dirCurrentPage=1;dirFilter()" style="background:#0a1420;border:1px solid #102030;color:#c0d8f0;font-family:var(--ff-mono);font-size:.65rem;padding:7px 10px;border-radius:4px;cursor:pointer;">
       <option value="">All Blocks</option>
       <option>B1</option><option>B2</option><option>B3</option>
       <option>B4</option><option>B5</option><option>B6</option>
     </select>
+    <select id="dir-per-page" onchange="dirCurrentPage=1;dirFilter()" style="background:#0a1420;border:1px solid #102030;color:#c0d8f0;font-family:var(--ff-mono);font-size:.65rem;padding:7px 10px;border-radius:4px;cursor:pointer;">
+      <option value="10">10 / page</option>
+      <option value="25">25 / page</option>
+      <option value="50">50 / page</option>
+      <option value="0">Show all</option>
+    </select>
   </div>
+  <!-- Pagination controls -->
+  <div id="dir-pagination" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;"></div>
 
   <!-- Add form -->
   <div class="dir-add-form" id="dir-add-form">
@@ -2805,7 +2859,7 @@
     <table class="dir-table">
       <thead>
         <tr>
-          <th>#</th>
+          <th style="width:36px;"></th><th>#</th>
           <th>Name</th>
           <th>Unit ID</th>
           <th>Block</th>
@@ -2819,6 +2873,27 @@
     </table>
     <div id="dir-empty" style="display:none;text-align:center;padding:30px;font-family:var(--ff-mono);font-size:.65rem;color:#1a3050;">No residents found.</div>
     <div id="dir-confirm" style="padding:8px 10px;font-family:var(--ff-mono);font-size:.62rem;min-height:16px;"></div>
+
+  <!-- Edit panel -->
+  <div id="dir-edit-panel" style="display:none;background:#060d18;border:1px solid #ffd06055;border-radius:6px;padding:16px 18px;margin-bottom:10px;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+    <div style="width:100%;font-family:var(--ff-mono);font-size:.6rem;color:#ffd060;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">✏ Editing Resident</div>
+    <div class="dir-field"><label>Name</label><input id="ep-name" type="text" style="width:120px;" /></div>
+    <div class="dir-field"><label>Block</label>
+      <select id="ep-block">
+        <option>B1</option><option>B2</option><option>B3</option>
+        <option>B4</option><option>B5</option><option>B6</option>
+      </select>
+    </div>
+    <div class="dir-field"><label>Floor</label><input id="ep-floor" type="number" min="1" max="20" style="width:60px;" /></div>
+    <div class="dir-field"><label>Unit</label><input id="ep-unit" type="number" min="1" max="10" style="width:60px;" /></div>
+    <div class="dir-field"><label>Parking</label><input id="ep-park" type="text" placeholder="B3 F-045" style="width:100px;" /></div>
+    <div class="dir-field"><label>Phone</label><input id="ep-phone" type="text" placeholder="+91..." style="width:110px;" /></div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button id="ep-save-btn" style="background:#ffd060;color:#060d18;border:none;border-radius:4px;padding:7px 18px;font-family:var(--ff-mono);font-size:.65rem;font-weight:700;cursor:pointer;">Save Changes</button>
+      <button id="ep-cancel-btn" style="background:none;border:1px solid #2a5070;color:#2a5070;border-radius:4px;padding:7px 14px;font-family:var(--ff-mono);font-size:.65rem;cursor:pointer;">Cancel</button>
+      <span id="ep-msg" style="font-family:var(--ff-mono);font-size:.6rem;color:#ff4060;"></span>
+    </div>
+  </div>
   </div>
 
   <div id="dir-confirm" style="padding:8px 10px;font-family:var(--ff-mono);font-size:.62rem;min-height:16px;"></div>
@@ -4648,23 +4723,46 @@ function amenInitClicks() {
 //  RESIDENT DIRECTORY
 // ═══════════════════════════════════════════════════════════════════════
 
-var residents = [
+// ── Persistent resident storage via localStorage ──
+var DIR_STORAGE_KEY = 'nexusprime_residents';
+var DIR_DEFAULT = [
   { id:1, name:'VISHRUTH', block:'B6', floor:20, unit:8, parking:'B3 F-045', phone:'' },
   { id:2, name:'ABILASH',  block:'B6', floor:20, unit:7, parking:'B3 C-025', phone:'' },
 ];
-var dirNextId = 3;
+
+function dirLoad() {
+  try {
+    var raw = localStorage.getItem(DIR_STORAGE_KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  return DIR_DEFAULT.map(function(r) { return Object.assign({}, r); });
+}
+
+function dirSave() {
+  try { localStorage.setItem(DIR_STORAGE_KEY, JSON.stringify(residents)); } catch(e) {}
+}
+
+var residents = dirLoad();
+var dirNextId = Math.max.apply(null, residents.map(function(r){ return r.id || 0; }).concat([0])) + 1;
+var dirCurrentPage = 1;
+
 
 function dirUnitId(r) {
   return r.block + '-' + String(r.floor).padStart(2,'0') + String(r.unit).padStart(2,'0');
 }
 
-function dirRender(list) {
+function dirRender(list, total, page, totalPages, perPage) {
   var tbody = document.getElementById('dir-tbody');
   var empty = document.getElementById('dir-empty');
   if (!tbody) return;
   if (!list || list.length === 0) {
     tbody.innerHTML = '';
     if (empty) empty.style.display = 'block';
+    dirPaginationUI(0, page, totalPages, perPage);
+    dirCountUI(0, total);
     return;
   }
   if (empty) empty.style.display = 'none';
@@ -4674,45 +4772,138 @@ function dirRender(list) {
     B4:'#ff7c5c', B5:'#c47aff', B6:'#e8c87a',
   };
 
+  var iS = 'background:#0a1420;border:1px solid #102030;color:#c0d8f0;' +
+           'font-family:monospace;font-size:.6rem;padding:3px 6px;' +
+           'border-radius:3px;box-sizing:border-box;';
+
   tbody.innerHTML = list.map(function(r, i) {
     var bc  = blockColors[r.block] || '#fff';
     var uid = dirUnitId(r);
-    return '<tr>'
+
+
+    var photoSrc = resPhotoGet(r.id);
+    var photoCell = photoSrc
+      ? '<img src="' + photoSrc + '" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #ffd06066;cursor:pointer;" onclick="resCardOpen(' + r.id + ')" />'
+      : '<div style="width:28px;height:28px;border-radius:50%;background:#0a1420;border:1px solid #102030;display:flex;align-items:center;justify-content:center;font-size:.8rem;cursor:pointer;" onclick="resCardOpen(' + r.id + ')">&#128100;</div>';
+    return '<tr data-rid=' + r.id + '>'
+      + '<td>' + photoCell + '</td>'
       + '<td style="color:#2a5070;">' + (i+1) + '</td>'
-      + '<td style="font-weight:700;color:#ffd060;">' + r.name + '</td>'
+      + '<td style="font-weight:700;color:#ffd060;cursor:pointer;text-decoration:underline dotted #ffd06066;" data-action="profile" data-rid=' + r.id + '>' + r.name + '</td>'
       + '<td><span class="dir-badge" style="background:' + bc + '22;color:' + bc + ';border:1px solid ' + bc + '44;">' + uid + '</span></td>'
       + '<td><span class="dir-badge" style="background:' + bc + '22;color:' + bc + ';">' + r.block + '</span></td>'
       + '<td style="color:#c0d8f0;">Floor ' + r.floor + '</td>'
       + '<td style="color:#00d4ff;">' + (r.parking || '—') + '</td>'
       + '<td style="color:#2a5070;">' + (r.phone || '—') + '</td>'
       + '<td style="white-space:nowrap;">'
-      + '<button onclick="dirEdit(' + r.id + ')" style="background:none;border:1px solid #ffd06044;border-radius:3px;color:#ffd060;font-family:var(--ff-mono);font-size:.52rem;padding:2px 8px;cursor:pointer;margin-right:4px;">Edit</button>'
-      + '<button onclick="dirRemove(' + r.id + ')" style="background:none;border:1px solid #ff406044;border-radius:3px;color:#ff4060;font-family:var(--ff-mono);font-size:.52rem;padding:2px 8px;cursor:pointer;">Remove</button>'
-      + '</td>'
-      + '</tr>';
+      + '<button data-action="edit" data-rid=' + r.id + ' style="background:none;border:1px solid #ffd06044;border-radius:3px;color:#ffd060;font-family:monospace;font-size:.52rem;padding:2px 8px;cursor:pointer;margin-right:4px;">Edit</button>'
+      + '<button data-action="remove" data-rid=' + r.id + ' style="background:none;border:1px solid #ff406044;border-radius:3px;color:#ff4060;font-family:monospace;font-size:.52rem;padding:2px 8px;cursor:pointer;">Remove</button>'
+      + '</td></tr>';
   }).join('');
 
+  // ── Event delegation — one listener handles all buttons ──
+  tbody.onclick = function(e) {
+    var tdEl = e.target.closest('td[data-action]');
+    if (tdEl) { var a=tdEl.dataset.action,ri=parseInt(tdEl.dataset.rid); if(a==='profile'){resCardOpen(ri);return;} }
+    var btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    var action = btn.dataset.action;
+    var rid    = parseInt(btn.dataset.rid);
+    if (action === 'edit')   { dirEdit(rid); }
+    if (action === 'remove') { dirRemove(rid); }
+    if (action === 'profile') { resCardOpen(rid); return; }
+    if (action === 'cancel') { dirCancelEdit(); }
+    if (action === 'save')   {
+      // Read inputs from the editing row
+      var row = btn.closest('tr');
+      var get = function(field) {
+        var el = row.querySelector('[data-field="' + field + '"]');
+        return el ? el.value : '';
+      };
+      var name  = get('name').trim().toUpperCase();
+      var block = get('block').trim();
+      var floor = parseInt(get('floor'));
+      var unit  = parseInt(get('unit'));
+      var park  = get('parking').trim();
+      var phone = get('phone').trim();
+      if (!name)                            { alert('Name is required.'); return; }
+      if (isNaN(floor)||floor<1||floor>20)  { alert('Floor must be 1-20.'); return; }
+      if (isNaN(unit) ||unit <1||unit >10)  { alert('Unit must be 1-10.');  return; }
+      var r = residents.find(function(x) { return x.id === rid; });
+      if (!r) return;
+      r.name = name; r.block = block; r.floor = floor;
+      r.unit = unit; r.parking = park; r.phone = phone;
+      dirEditingId = null;
+      dirSave();
+      dirFilter();
+      pkSyncOwners();
+      if (typeof flUpdateFloor === 'function') flUpdateFloor(flCurrentFloor);
+    }
+  };
 
+  // ── Summary strip ──
   var strip = document.getElementById('dir-summary-strip');
   if (strip) {
     var blocks = {};
     residents.forEach(function(r) { blocks[r.block] = (blocks[r.block] || 0) + 1; });
     strip.innerHTML = Object.keys(blocks).sort().map(function(b) {
       var bc = blockColors[b] || '#fff';
-      return '<div style="background:#0a1420;border:1px solid ' + bc + '44;border-radius:4px;padding:6px 14px;font-family:var(--ff-mono);font-size:.62rem;">'
+      return '<div style="background:#0a1420;border:1px solid ' + bc + '44;border-radius:4px;padding:6px 14px;font-family:monospace;font-size:.62rem;">'
         + '<span style="color:' + bc + ';font-weight:700;">' + b + '</span>'
         + ' <span style="color:#2a5070;font-size:.55rem;">' + blocks[b] + ' resident' + (blocks[b] > 1 ? 's' : '') + '</span>'
         + '</div>';
     }).join('');
   }
 
-  var countEl = document.getElementById('dir-count');
-  if (countEl) countEl.textContent = residents.length + ' resident' + (residents.length !== 1 ? 's' : '');
+  dirPaginationUI(list.length, page, totalPages, perPage);
+  dirCountUI(list.length, total);
 }
 
-function dirFilter() {
+function dirPaginationUI(shown, page, totalPages, perPage) {
+  var pgEl = document.getElementById('dir-pagination');
+  if (!pgEl) return;
+  if (typeof totalPages === 'undefined' || totalPages <= 1) {
+    pgEl.innerHTML = ''; pgEl.style.display = 'none'; return;
+  }
+  var b = 'font-family:monospace;font-size:.58rem;padding:3px 9px;border-radius:3px;cursor:pointer;border:1px solid;';
+  var off = 'color:#1a3050;border-color:#0a2030;background:none;pointer-events:none;';
+  var on  = 'color:#2a5070;border-color:#102030;background:#0a1420;';
+  var act = 'color:#060d18;border-color:#00d4ff;background:#00d4ff;font-weight:700;';
+  var html = '<button data-pg=' + (page-1) + ' style="' + b + (page<=1?off:on) + '">‹ Prev</button>';
+  var pages = [];
+  for (var p=1; p<=totalPages; p++) {
+    if (p===1||p===totalPages||(p>=page-2&&p<=page+2)) pages.push(p);
+    else if (pages[pages.length-1]!=='...') pages.push('...');
+  }
+  pages.forEach(function(p) {
+    if (p==='...') { html += '<span style="font-family:monospace;font-size:.58rem;color:#1a3050;padding:0 4px;">…</span>'; return; }
+    html += '<button data-pg=' + p + ' style="' + b + (p===page?act:on) + '">' + p + '</button>';
+  });
+  html += '<button data-pg=' + (page+1) + ' style="' + b + (page>=totalPages?off:on) + '">Next ›</button>';
+  html += '<span style="font-family:monospace;font-size:.55rem;color:#1a3050;margin-left:6px;">Page ' + page + ' of ' + totalPages + '</span>';
+  pgEl.innerHTML = html;
+  pgEl.style.display = 'flex';
+  pgEl.onclick = function(e) {
+    var btn = e.target.closest('button[data-pg]');
+    if (!btn) return;
+    var pg = parseInt(btn.dataset.pg);
+    if (pg >= 1 && pg <= totalPages) { dirCurrentPage = pg; dirFilter(); }
+  };
+}
+
+function dirCountUI(shown, total) {
+  var el = document.getElementById('dir-count');
+  if (!el) return;
+  var tot = (typeof total !== 'undefined') ? total : residents.length;
+  el.textContent = (shown < tot)
+    ? shown + ' of ' + tot + ' residents'
+    : tot + ' resident' + (tot !== 1 ? 's' : '');
+}
+
+function dirFilter(resetPage) {
+  if (resetPage) dirCurrentPage = 1;
   var q  = (document.getElementById('dir-search').value || '').trim().toLowerCase();
   var bf = (document.getElementById('dir-block-filter').value || '').trim();
+  var pp = parseInt((document.getElementById('dir-per-page') || {}).value || '10');
   var filtered = residents.filter(function(r) {
     var uid    = dirUnitId(r).toLowerCase();
     var matchQ = !q  || r.name.toLowerCase().includes(q) || uid.includes(q)
@@ -4721,7 +4912,16 @@ function dirFilter() {
     var matchB = !bf || r.block === bf;
     return matchQ && matchB;
   });
-  dirRender(filtered);
+
+  // Pagination
+  var total = filtered.length;
+  var perPage = (pp === 0) ? total : pp;
+  var totalPages = perPage > 0 ? Math.ceil(total / perPage) : 1;
+  if (dirCurrentPage > totalPages) dirCurrentPage = totalPages || 1;
+  var start = (dirCurrentPage - 1) * perPage;
+  var paged = (pp === 0) ? filtered : filtered.slice(start, start + perPage);
+
+  dirRender(paged, total, dirCurrentPage, totalPages, perPage);
 }
 
 function dirToggleForm() {
@@ -4751,6 +4951,7 @@ function dirAddResident() {
   if (isNaN(unit)  || unit  < 1 || unit  > 10) { msg.textContent = 'Unit must be 1-10.'; return; }
 
   residents.push({ id: dirNextId++, name: name, block: block, floor: floor, unit: unit, parking: park, phone: phone });
+  dirSave();
   msg.textContent = '';
   dirToggleForm();
   dirFilter();
@@ -4760,68 +4961,56 @@ function dirAddResident() {
   }
 }
 
+
+
+
+
+var dirEditingId = null;
+
 function dirEdit(id) {
   var r = residents.find(function(x) { return x.id === id; });
   if (!r) return;
-  var tbody = document.getElementById('dir-tbody');
-  if (!tbody) return;
-
-  // Find the row with this id's Remove button
-  var rows = tbody.querySelectorAll('tr');
-  var targetRow = null;
-  rows.forEach(function(row) {
-    var btn = row.querySelector('button[onclick]');
-    if (btn && btn.getAttribute('onclick') === 'dirRemove(' + id + ')') {
-      targetRow = row;
-    }
-  });
-  if (!targetRow) return;
-
-  var blockColors = { B1:'#00d4ff',B2:'#00e87a',B3:'#ffd060',B4:'#ff7c5c',B5:'#c47aff',B6:'#e8c87a' };
-  var blockOpts = ['B1','B2','B3','B4','B5','B6'].map(function(b) {
-    return '<option value="' + b + '"' + (r.block === b ? ' selected' : '') + '>' + b + '</option>';
-  }).join('');
-
-  var inputStyle = 'background:#0a1420;border:1px solid #102030;color:#c0d8f0;font-family:var(--ff-mono);font-size:.6rem;padding:3px 6px;border-radius:3px;width:100%;box-sizing:border-box;';
-
-  targetRow.innerHTML = ''
-    + '<td style="color:#2a5070;font-family:var(--ff-mono);font-size:.6rem;">✏</td>'
-    + '<td><input id="dir-e-name" value="' + r.name + '" style="' + inputStyle + 'width:90px;font-weight:700;color:#ffd060;" /></td>'
-    + '<td><select id="dir-e-block" style="' + inputStyle + 'width:52px;">' + blockOpts + '</select></td>'
-    + '<td><input id="dir-e-floor" type="number" min="1" max="20" value="' + r.floor + '" style="' + inputStyle + 'width:44px;" /></td>'
-    + '<td><input id="dir-e-unit" type="number" min="1" max="10" value="' + r.unit + '" style="' + inputStyle + 'width:40px;" /></td>'
-    + '<td><input id="dir-e-park" value="' + (r.parking || '') + '" placeholder="B3 F-045" style="' + inputStyle + 'width:80px;" /></td>'
-    + '<td><input id="dir-e-phone" value="' + (r.phone || '') + '" placeholder="+91..." style="' + inputStyle + 'width:80px;" /></td>'
-    + '<td style="white-space:nowrap;">'
-    +   '<button onclick="dirSaveEdit(' + id + ')" style="background:#ffd060;color:#060d18;border:none;border-radius:3px;padding:2px 8px;font-family:var(--ff-mono);font-size:.52rem;font-weight:700;cursor:pointer;margin-right:4px;">Save</button>'
-    +   '<button onclick="dirFilter()" style="background:none;border:1px solid #2a5070;color:#2a5070;border-radius:3px;padding:2px 6px;font-family:var(--ff-mono);font-size:.52rem;cursor:pointer;">Cancel</button>'
-    + '</td>';
+  dirEditingId = id;
+  document.getElementById('ep-name').value  = r.name;
+  document.getElementById('ep-block').value = r.block;
+  document.getElementById('ep-floor').value = r.floor;
+  document.getElementById('ep-unit').value  = r.unit;
+  document.getElementById('ep-park').value  = r.parking || '';
+  document.getElementById('ep-phone').value = r.phone   || '';
+  document.getElementById('ep-msg').textContent = '';
+  document.getElementById('dir-edit-panel').style.display = 'flex';
+  document.getElementById('ep-name').focus();
 }
 
-function dirSaveEdit(id) {
-  var r = residents.find(function(x) { return x.id === id; });
+function dirSaveEdit() {
+  if (!dirEditingId) return;
+  var r = residents.find(function(x) { return x.id === dirEditingId; });
   if (!r) return;
-
-  var name  = (document.getElementById('dir-e-name').value  || '').trim().toUpperCase();
-  var block = (document.getElementById('dir-e-block').value || '').trim();
-  var floor = parseInt(document.getElementById('dir-e-floor').value);
-  var unit  = parseInt(document.getElementById('dir-e-unit').value);
-  var park  = (document.getElementById('dir-e-park').value  || '').trim();
-  var phone = (document.getElementById('dir-e-phone').value || '').trim();
-
-  if (!name) { alert('Name is required.'); return; }
-  if (isNaN(floor) || floor < 1 || floor > 20) { alert('Floor must be 1–20.'); return; }
-  if (isNaN(unit)  || unit  < 1 || unit  > 10) { alert('Unit must be 1–10.'); return; }
-
+  var name  = (document.getElementById('ep-name').value  || '').trim().toUpperCase();
+  var block = (document.getElementById('ep-block').value || '').trim();
+  var floor = parseInt(document.getElementById('ep-floor').value);
+  var unit  = parseInt(document.getElementById('ep-unit').value);
+  var park  = (document.getElementById('ep-park').value  || '').trim();
+  var phone = (document.getElementById('ep-phone').value || '').trim();
+  var msg   = document.getElementById('ep-msg');
+  if (!name)                           { msg.textContent = 'Name required.'; return; }
+  if (isNaN(floor)||floor<1||floor>20) { msg.textContent = 'Floor must be 1-20.'; return; }
+  if (isNaN(unit) ||unit <1||unit >10) { msg.textContent = 'Unit must be 1-10.';  return; }
   r.name = name; r.block = block; r.floor = floor;
   r.unit = unit; r.parking = park; r.phone = phone;
-
+  dirEditingId = null;
+  document.getElementById('dir-edit-panel').style.display = 'none';
+  dirSave();
   dirFilter();
   pkSyncOwners();
-  if (typeof flUpdateFloor === 'function' && typeof flCurrentFloor !== 'undefined') {
-    flUpdateFloor(flCurrentFloor);
-  }
+  if (typeof flUpdateFloor === 'function') flUpdateFloor(flCurrentFloor);
 }
+
+function dirCancelEdit() {
+  dirEditingId = null;
+  document.getElementById('dir-edit-panel').style.display = 'none';
+}
+
 
 function dirConfirm(msg, onYes) {
   var el = document.getElementById('dir-confirm');
@@ -4849,6 +5038,7 @@ function dirRemove(id) {
   if (!r) return;
   dirConfirm('Remove ' + r.name + ' from directory?', function() {
     residents = residents.filter(function(x) { return x.id !== id; });
+    dirSave();
     dirFilter();
     pkSyncOwners();
     if (typeof flUpdateFloor === 'function' && typeof flCurrentFloor !== 'undefined') {
@@ -4857,7 +5047,8 @@ function dirRemove(id) {
   });
 }
 
-function dirInit() { dirFilter(); }
+
+function dirInit() { dirCurrentPage = 1; dirFilter(); }
 
 // ═══════════════════════════════════════════════════════════════════════
 //  ISOMETRIC BLOCK VIEW
@@ -4874,13 +5065,334 @@ function initAll() {
 
   amenInitClicks();
   dirInit();
+  // Wire edit panel buttons
+  var epSave   = document.getElementById('ep-save-btn');
+  var epCancel = document.getElementById('ep-cancel-btn');
+  if (epSave)   epSave.addEventListener('click', dirSaveEdit);
+  if (epCancel) epCancel.addEventListener('click', dirCancelEdit);
+
+  // Wire avatar: one handler decides lightbox vs upload
+  var avatarWrap = document.getElementById('rc-avatar');
+  if (avatarWrap) {
+    avatarWrap.addEventListener('click', function(e) {
+      var imgEl = document.getElementById('rc-avatar-img');
+      var hasPhoto = imgEl && imgEl.style.display !== 'none' && imgEl.src && imgEl.src !== window.location.href;
+      if (hasPhoto) {
+        // Photo is showing — open lightbox
+        var name = (document.getElementById('rc-name') || {}).textContent || '';
+        photoLightboxOpen(imgEl.src, name);
+      } else {
+        // No photo yet — open upload picker
+        resPhotoUpload();
+      }
+    });
+  }
 }
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initAll);
 } else {
   initAll();  // DOM already ready (script at bottom of body)
 }
+
+// ═══════════════════════════════════════════════════════════
+// RESIDENT PROFILE CARD
+// ═══════════════════════════════════════════════════════════
+var resCardCurrentId = null;
+
+function resCardOpen(id) {
+  var r = residents.find(function(x) { return x.id === id; });
+  if (!r) return;
+  resCardCurrentId = id;
+  var blockColors = { B1:'#00d4ff',B2:'#00e87a',B3:'#ffd060',B4:'#ff7c5c',B5:'#c47aff',B6:'#e8c87a' };
+  var bc = blockColors[r.block] || '#00d4ff';
+  document.getElementById('rc-name').textContent  = r.name;
+  document.getElementById('rc-name').style.color  = bc;
+  document.getElementById('rc-uid').textContent   = dirUnitId(r);
+  var av = document.getElementById('rc-avatar');
+  av.style.background  = bc + '22';
+  av.style.borderColor = bc;
+  document.getElementById('rc-block').textContent   = r.block;
+  document.getElementById('rc-block').style.color   = bc;
+  document.getElementById('rc-floor').textContent   = 'Floor ' + r.floor + (r.floor === 20 ? ' — Penthouse' : r.floor === 1 ? ' — Ground' : '');
+  document.getElementById('rc-unit').textContent    = 'Unit ' + r.unit;
+  document.getElementById('rc-phone').textContent   = r.phone   || '—';
+  var pkEl = document.getElementById('rc-parking');
+  pkEl.textContent   = r.parking || '—';
+  pkEl.style.color   = r.parking ? '#00d4ff' : '#2a5070';
+  document.getElementById('rc-floor-hint').textContent   = r.block + ' · Floor ' + r.floor + ' · Unit ' + r.unit;
+  document.getElementById('rc-parking-hint').textContent = r.parking ? r.parking : 'No parking assigned';
+  var goPk = document.getElementById('rc-goto-parking');
+  goPk.style.opacity       = r.parking ? '1' : '0.4';
+  goPk.style.pointerEvents = r.parking ? 'auto' : 'none';
+  // Mini floor preview
+  var mini = document.getElementById('rc-mini-floor');
+  mini.innerHTML = '';
+  for (var u = 1; u <= 10; u++) {
+    var cell = document.createElement('div');
+    cell.className = 'rc-mini-unit' + (u === r.unit ? ' rc-mini-active' : '');
+    cell.textContent = u;
+    mini.appendChild(cell);
+  }
+  // Load photo if saved
+  resCardShowPhoto(resPhotoGet(id));
+  document.getElementById('res-card').classList.add('open');
+}
+
+
+function resCardClose() {
+  document.getElementById('res-card').classList.remove('open');
+  resCardCurrentId = null;
+}
+
+function resCardGotoFloor() {
+  var r = residents.find(function(x) { return x.id === resCardCurrentId; });
+  if (!r) return;
+  resCardClose();
+  // Switch to floor tab
+  document.querySelectorAll('.tab-btn').forEach(function(b) {
+    if (b.getAttribute('data-tab') === 'floor') { switchTab('floor', b); }
+  });
+  setTimeout(function() {
+    // Select block
+    document.querySelectorAll('.blk-btn').forEach(function(b) {
+      if (b.getAttribute('data-block') === r.block) { flSelectBlock(r.block, b); }
+    });
+    setTimeout(function() {
+      flUpdateFloor(r.floor);
+      // Update slider if present
+      var sl = document.getElementById('fl-floor-slider');
+      if (sl) { sl.value = r.floor; }
+      var fn = document.getElementById('fl-floor-num');
+      if (fn) fn.textContent = r.floor;
+      // Highlight unit after render
+      setTimeout(function() {
+        document.querySelectorAll('.fl-unit').forEach(function(u) {
+          u.style.outline = '';
+          u.style.boxShadow = '';
+        });
+        var unitStr = String(r.floor).padStart(2,'0') + String(r.unit).padStart(2,'0');
+        document.querySelectorAll('.fl-unit').forEach(function(u) {
+          var lbl = u.querySelector('div');
+          if (lbl && lbl.textContent.includes(r.block) && lbl.textContent.includes(unitStr)) {
+            u.style.outline   = '3px solid #ffd060';
+            u.style.boxShadow = '0 0 16px #ffd06088';
+            u.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      }, 80);
+    }, 60);
+  }, 250);
+}
+
+function resCardGotoParking() {
+  var r = residents.find(function(x) { return x.id === resCardCurrentId; });
+  if (!r || !r.parking) return;
+  resCardClose();
+  var m = r.parking.trim().match(/^B([123])\s+([A-Ha-h])-(\d+)$/i);
+  // Switch to parking tab first
+  document.querySelectorAll('.tab-btn').forEach(function(b) {
+    if (b.getAttribute('data-tab') === 'parking') { switchTab('parking', b); }
+  });
+  if (!m) return;
+  var lvlIdx  = parseInt(m[1]) - 1;
+  var rowIdx  = m[2].toUpperCase().charCodeAt(0) - 65;
+  var slotIdx = parseInt(m[3]) - 1;
+  var key     = lvlIdx + '-' + rowIdx + '-' + slotIdx;
+  setTimeout(function() {
+    var lvlBtn = document.getElementById('pk-btn-' + lvlIdx);
+    if (lvlBtn) { pkCurrentLevel = lvlIdx; lvlBtn.click(); }
+    setTimeout(function() {
+      pkSearchHighlight = key;
+      pkRenderLevel(lvlIdx);
+      var svg = document.getElementById('pk-svg');
+      if (svg) pkDrawPath(svg, lvlIdx, rowIdx, slotIdx);
+      if (svg) svg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+  }, 250);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// RESIDENT PHOTOS  (stored in localStorage as base64)
+// ═══════════════════════════════════════════════════════════
+var PHOTO_KEY = 'nexusprime_photos';
+
+function resPhotoAll() {
+  try { return JSON.parse(localStorage.getItem(PHOTO_KEY) || '{}'); } catch(e) { return {}; }
+}
+function resPhotoGet(id) {
+  return resPhotoAll()[String(id)] || null;
+}
+function resPhotoSet(id, dataUrl) {
+  var photos = resPhotoAll();
+  photos[String(id)] = dataUrl;
+  try { localStorage.setItem(PHOTO_KEY, JSON.stringify(photos)); } catch(e) {
+    alert('Photo could not be saved — it may be too large. Try a smaller image.');
+    return false;
+  }
+  return true;
+}
+function resPhotoDelete(id) {
+  var photos = resPhotoAll();
+  delete photos[String(id)];
+  try { localStorage.setItem(PHOTO_KEY, JSON.stringify(photos)); } catch(e) {}
+}
+
+function resPhotoUpload() {
+  var inp = document.getElementById('rc-photo-input');
+  if (inp) inp.click();
+}
+
+function resPhotoSelected(event) {
+  var file = event.target.files && event.target.files[0];
+  if (!file || !resCardCurrentId) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    // Resize to max 200px to keep localStorage usage small
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var MAX = 200;
+      var scale = Math.min(MAX / img.width, MAX / img.height, 1);
+      canvas.width  = Math.round(img.width  * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      if (resPhotoSet(resCardCurrentId, dataUrl)) {
+        resCardShowPhoto(dataUrl);
+        dirFilter(); // refresh table thumbnail
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  // Reset so same file can be re-selected
+  event.target.value = '';
+}
+
+function resCardShowPhoto(src) {
+  var imgEl  = document.getElementById('rc-avatar-img');
+  var iconEl = document.getElementById('rc-avatar-icon');
+  var delBtn = document.getElementById('rc-photo-del');
+  if (src) {
+    imgEl.src = src;
+    imgEl.style.display = 'block';
+    imgEl.style.cursor = 'zoom-in';
+    iconEl.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'inline-block';
+  } else {
+    imgEl.src = '';
+    imgEl.style.display = 'none';
+    iconEl.style.display = '';
+    if (delBtn) delBtn.style.display = 'none';
+  }
+}
+
+
+function resPhotoRemove() {
+  if (!resCardCurrentId) return;
+  resPhotoDelete(resCardCurrentId);
+  resCardShowPhoto(null);
+  dirFilter();
+}
+
+// ── Photo Lightbox ──
+function photoLightboxOpen(src, name) {
+  var lb  = document.getElementById('photo-lightbox');
+  var img = document.getElementById('photo-lightbox-img');
+  var lbl = document.getElementById('photo-lightbox-name');
+  if (!lb || !img || !src) return;
+  img.src = src;
+  if (lbl) lbl.textContent = name || '';
+  lb.style.display = 'flex';
+  // Close on Escape
+  document._lbKeyHandler = function(e) {
+    if (e.key === 'Escape') photoLightboxClose();
+  };
+  document.addEventListener('keydown', document._lbKeyHandler);
+}
+
+function photoLightboxClose() {
+  var lb = document.getElementById('photo-lightbox');
+  if (lb) lb.style.display = 'none';
+  if (document._lbKeyHandler) {
+    document.removeEventListener('keydown', document._lbKeyHandler);
+    document._lbKeyHandler = null;
+  }
+}
+
 </script>
 
+
+<!-- Resident Profile Card -->
+<div id="res-card">
+  <button id="res-card-close" onclick="resCardClose()">&#10005;</button>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+    <div id="rc-avatar" title="Click avatar to upload photo"
+         style="width:64px;height:64px;border-radius:50%;background:#ffd06022;border:2px solid #ffd060;
+                display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;
+                cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s;">
+      <img id="rc-avatar-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;border-radius:50%;cursor:zoom-in;" />
+      <span id="rc-avatar-icon">&#128100;</span>
+      <div id="rc-avatar-hover" style="position:absolute;inset:0;background:#000a;border-radius:50%;
+           display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#ffd060;
+           font-family:var(--ff-mono);opacity:0;transition:opacity .15s;text-align:center;line-height:1.3;">
+           &#128247;<br>Upload
+      </div>
+    </div>
+    <input type="file" id="rc-photo-input" accept="image/*" style="display:none;" onchange="resPhotoSelected(event)" />
+    <div style="font-family:var(--ff-mono);font-size:.48rem;">
+      <div style="color:#2a5070;font-size:.48rem;margin-top:4px;">Click to enlarge &nbsp;·&nbsp; No photo: click to upload</div>
+      <button id="rc-photo-del" onclick="resPhotoRemove()" style="display:none;margin-top:3px;background:none;border:none;color:#ff4060;font-family:var(--ff-mono);font-size:.48rem;cursor:pointer;padding:0;text-decoration:underline;">Remove photo</button>
+    </div>
+    <div>
+      <div id="rc-name" style="font-family:var(--ff-head);font-size:1.15rem;font-weight:700;color:#ffd060;line-height:1.1;"></div>
+      <div id="rc-uid" style="font-size:.58rem;color:#2a5070;margin-top:3px;letter-spacing:.08em;"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 20px;">
+    <div><div class="rc-label">Block</div><div id="rc-block" class="rc-value"></div></div>
+    <div><div class="rc-label">Floor</div><div id="rc-floor" class="rc-value"></div></div>
+    <div><div class="rc-label">Unit</div><div id="rc-unit" class="rc-value"></div></div>
+    <div><div class="rc-label">Phone</div><div id="rc-phone" class="rc-value"></div></div>
+    <div style="grid-column:1/-1;"><div class="rc-label">Parking Slot</div><div id="rc-parking" class="rc-value"></div></div>
+  </div>
+  <hr class="rc-divider">
+  <div class="rc-label" style="margin-bottom:6px;">Unit Position on Floor</div>
+  <div class="rc-mini-floor" id="rc-mini-floor"></div>
+  <hr class="rc-divider">
+  <div class="rc-label" style="margin-bottom:8px;">Jump To</div>
+  <button class="rc-link-btn" id="rc-goto-floor" onclick="resCardGotoFloor()">
+    <span class="rc-link-icon">&#127970;</span>
+    <div><div class="rc-link-title">Floor Layout</div><div class="rc-link-text" id="rc-floor-hint">Opens floor layout and highlights this unit</div></div>
+  </button>
+  <button class="rc-link-btn" id="rc-goto-parking" onclick="resCardGotoParking()">
+    <span class="rc-link-icon">&#127359;</span>
+    <div><div class="rc-link-title">Parking Map</div><div class="rc-link-text" id="rc-parking-hint">Opens parking and highlights this slot</div></div>
+  </button>
+</div>
+
+<!-- Photo Lightbox -->
+<div id="photo-lightbox" onclick="photoLightboxClose()" style="
+  display:none; position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,.88); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; cursor:zoom-out;">
+  <div style="position:relative; max-width:90vw; max-height:90vh;">
+    <img id="photo-lightbox-img" src="" alt="" style="
+      max-width:90vw; max-height:85vh; border-radius:8px;
+      box-shadow:0 0 60px #000c, 0 0 0 1px #ffd06033;
+      display:block; object-fit:contain;" />
+    <div id="photo-lightbox-name" style="
+      text-align:center; margin-top:12px;
+      font-family:var(--ff-head); font-size:1rem; font-weight:600;
+      color:#ffd060; letter-spacing:.08em;"></div>
+    <button onclick="photoLightboxClose()" style="
+      position:absolute; top:-14px; right:-14px;
+      background:#060d18; border:1px solid #ffd06044; border-radius:50%;
+      width:32px; height:32px; color:#ffd060; font-size:1rem;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      line-height:1;">&#10005;</button>
+  </div>
+</div>
 </body>
 </html>
