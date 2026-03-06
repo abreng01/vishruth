@@ -209,6 +209,91 @@
   #amen-card-close:hover { color:#ffd060; }
 
 
+
+  /* ── Occupancy Chart ── */
+  #view-occ {
+    width:100%; max-width:1300px; display:none; flex-direction:column;
+    gap:16px; margin-top:12px;
+  }
+  .occ-wrap {
+    background:var(--surface); border:1px solid var(--wall);
+    border-radius:6px; padding:18px 20px;
+  }
+  .occ-title {
+    font-family:var(--ff-mono); font-size:.65rem; color:var(--gold);
+    letter-spacing:.15em; text-transform:uppercase; margin-bottom:14px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .occ-legend {
+    display:flex; gap:14px; align-items:center;
+  }
+  .occ-legend-item {
+    display:flex; align-items:center; gap:5px;
+    font-family:var(--ff-mono); font-size:.55rem; color:var(--muted);
+  }
+  .occ-legend-dot {
+    width:10px; height:10px; border-radius:2px; flex-shrink:0;
+  }
+  .occ-grid-wrap {
+    overflow-x:auto;
+  }
+  .occ-grid {
+    display:grid;
+    grid-template-columns: 32px repeat(6, 1fr);
+    gap:3px; min-width:400px;
+  }
+  .occ-col-hdr {
+    font-family:var(--ff-mono); font-size:.58rem; font-weight:700;
+    text-align:center; padding:4px 2px; border-radius:3px;
+  }
+  .occ-row-lbl {
+    font-family:var(--ff-mono); font-size:.52rem; color:var(--muted);
+    display:flex; align-items:center; justify-content:flex-end;
+    padding-right:6px; height:28px;
+  }
+  .occ-cell {
+    height:28px; border-radius:3px; display:flex; align-items:center;
+    justify-content:center; font-family:var(--ff-mono); font-size:.48rem;
+    font-weight:600; cursor:default; transition:filter .12s;
+    border:1px solid transparent; position:relative;
+  }
+  .occ-cell:hover { filter:brightness(1.3); z-index:2; }
+  .occ-cell.occ-vacant {
+    background:#0a1420; border-color:#102030; color:#1a3050;
+  }
+  .occ-cell.occ-partial {
+    background:#ffd06028; border-color:#ffd06055; color:#ffd060;
+  }
+  .occ-cell.occ-full {
+    background:#ffd060; border-color:#ffd060; color:#060d18;
+  }
+  /* Summary bar */
+  .occ-summary {
+    display:grid; grid-template-columns:repeat(6, 1fr); gap:8px;
+    margin-top:12px;
+  }
+  .occ-sum-card {
+    background:#0a1420; border:1px solid #102030; border-radius:5px;
+    padding:10px 12px; text-align:center;
+  }
+  .occ-sum-name {
+    font-family:var(--ff-mono); font-size:.55rem; font-weight:700;
+    margin-bottom:6px;
+  }
+  .occ-sum-bar-wrap {
+    height:6px; background:#0d1e30; border-radius:3px; overflow:hidden; margin-bottom:5px;
+  }
+  .occ-sum-bar-fill {
+    height:100%; border-radius:3px; background:#ffd060; transition:width .4s;
+  }
+  .occ-sum-stats {
+    font-family:var(--ff-mono); font-size:.5rem; color:var(--muted);
+  }
+
+  /* ── Drag & Drop ── */
+  #dir-tbody tr.dnd-over td { background:rgba(0,212,255,0.06); }
+  #dir-tbody tr.dnd-dragging { opacity:0.4; }
+  .dir-drag-handle:hover { color:rgba(0,212,255,0.8) !important; }
   /* ── Resident Profile Card ── */
   #res-card {
     position:fixed; right:-420px; top:50%; transform:translateY(-50%);
@@ -2469,6 +2554,25 @@
 
   </div>
 </div>
+<!-- Occupancy Chart Panel (shown in Blocks tab) -->
+<div id="view-occ">
+  <div class="occ-wrap">
+    <div class="occ-title">
+      <span>&#9632; Block &amp; Floor Occupancy</span>
+      <div class="occ-legend">
+        <div class="occ-legend-item"><div class="occ-legend-dot" style="background:#ffd060;"></div>Occupied</div>
+        <div class="occ-legend-item"><div class="occ-legend-dot" style="background:#0a1420;border:1px solid #102030;"></div>Vacant</div>
+        <span id="occ-total-label" style="color:var(--muted);font-size:.55rem;"></span>
+      </div>
+    </div>
+    <div class="occ-grid-wrap">
+      <div class="occ-grid" id="occ-grid"></div>
+    </div>
+    <div class="occ-summary" id="occ-summary"></div>
+  </div>
+</div>
+
+
 
 <!-- ═══════════════════════════════════════════════════════
      FLOOR LAYOUT VIEW PANEL
@@ -2794,8 +2898,11 @@
       <div style="font-family:var(--ff-mono);font-size:.6rem;color:#ffd060;letter-spacing:.2em;text-transform:uppercase;margin-bottom:3px;">◈ Resident Data</div>
       <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;letter-spacing:.06em;">RESIDENT DIRECTORY</div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <span id="dir-count" style="font-family:var(--ff-mono);font-size:.6rem;color:#2a5070;"></span>
+      <button onclick="dirExport()" style="background:none;border:1px solid rgba(0,212,255,0.4);color:rgba(0,212,255,0.9);border-radius:4px;padding:7px 14px;font-family:var(--ff-mono);font-size:.62rem;cursor:pointer;letter-spacing:.05em;">&#8595; Export</button>
+      <button onclick="dirImportClick()" style="background:none;border:1px solid rgba(0,212,255,0.4);color:rgba(0,212,255,0.9);border-radius:4px;padding:7px 14px;font-family:var(--ff-mono);font-size:.62rem;cursor:pointer;letter-spacing:.05em;">&#8593; Import</button>
+      <input type="file" id="dir-import-input" accept=".json" style="display:none;" onchange="dirImportFile(event)">
       <button onclick="dirToggleForm()" style="background:#ffd060;color:#060d18;border:none;border-radius:4px;padding:7px 16px;font-family:var(--ff-mono);font-size:.62rem;font-weight:700;cursor:pointer;letter-spacing:.08em;">＋ Add Resident</button>
     </div>
   </div>
@@ -2859,7 +2966,7 @@
     <table class="dir-table">
       <thead>
         <tr>
-          <th style="width:36px;"></th><th>#</th>
+          <th style="width:24px;"></th><th style="width:36px;"></th><th>#</th>
           <th>Name</th>
           <th>Unit ID</th>
           <th>Block</th>
@@ -3134,6 +3241,13 @@ function switchTab(tab, btn) {
   if (vDir) vDir.style.display = tab === 'directory' ? 'flex' : 'none';
   if (tab === 'directory') dirInit();
 
+  // Occupancy chart — show in blocks tab
+  var vOcc = document.getElementById('view-occ');
+  if (vOcc) {
+    vOcc.style.display = tab === 'blocks' ? 'flex' : 'none';
+    if (tab === 'blocks') occRender();
+  }
+
   // Close amenity card when switching tabs
   amenCardClose();
 }
@@ -3269,7 +3383,7 @@ function flBuildUnit(blockId, floorNum, unitNum, data, side) {
 
   if (ownerName) {
     div.style.borderColor  = '#ffd060';
-    div.style.background   = '#ffd06018';
+    div.style.background   = 'rgba(255,208,96,0.09)';
     div.style.boxShadow    = '0 0 12px #ffd06055';
   }
   div.innerHTML = `
@@ -3397,14 +3511,14 @@ const PK = {
 // Block allocation zones per row (which flats own which slot ranges)
 // Each entry: [rowIdx, slotStart, slotEnd, blockLabel, colour]
 const PK_BLOCK_ZONES = [
-  [0,  0, 16, 'B1',  '#00d4ff22'], [0, 17, 33, 'B2', '#00e87a22'], [0, 34, 49, 'B3', '#ffd06022'],
-  [1,  0, 16, 'B1',  '#00d4ff22'], [1, 17, 33, 'B2', '#00e87a22'], [1, 34, 49, 'B3', '#ffd06022'],
-  [2,  0, 16, 'B1',  '#00d4ff22'], [2, 17, 33, 'B2', '#00e87a22'], [2, 34, 49, 'B3', '#ffd06022'],
-  [3,  0, 16, 'B1',  '#00d4ff22'], [3, 17, 33, 'B2', '#00e87a22'], [3, 34, 49, 'B3', '#ffd06022'],
-  [4,  0, 16, 'B4',  '#ff7c5c22'], [4, 17, 33, 'B5', '#c47aff22'], [4, 34, 49, 'B6', '#e8c87a22'],
-  [5,  0, 16, 'B4',  '#ff7c5c22'], [5, 17, 33, 'B5', '#c47aff22'], [5, 34, 49, 'B6', '#e8c87a22'],
-  [6,  0, 16, 'B4',  '#ff7c5c22'], [6, 17, 33, 'B5', '#c47aff22'], [6, 34, 49, 'B6', '#e8c87a22'],
-  [7,  0, 16, 'B4',  '#ff7c5c22'], [7, 17, 33, 'B5', '#c47aff22'], [7, 34, 49, 'B6', '#e8c87a22'],
+  [0,  0, 16, 'B1',  'rgba(0,212,255,0.13)'], [0, 17, 33, 'B2', 'rgba(0,232,122,0.13)'], [0, 34, 49, 'B3', 'rgba(255,208,96,0.13)'],
+  [1,  0, 16, 'B1',  'rgba(0,212,255,0.13)'], [1, 17, 33, 'B2', 'rgba(0,232,122,0.13)'], [1, 34, 49, 'B3', 'rgba(255,208,96,0.13)'],
+  [2,  0, 16, 'B1',  'rgba(0,212,255,0.13)'], [2, 17, 33, 'B2', 'rgba(0,232,122,0.13)'], [2, 34, 49, 'B3', 'rgba(255,208,96,0.13)'],
+  [3,  0, 16, 'B1',  'rgba(0,212,255,0.13)'], [3, 17, 33, 'B2', 'rgba(0,232,122,0.13)'], [3, 34, 49, 'B3', 'rgba(255,208,96,0.13)'],
+  [4,  0, 16, 'B4',  'rgba(255,124,92,0.13)'], [4, 17, 33, 'B5', 'rgba(196,122,255,0.13)'], [4, 34, 49, 'B6', 'rgba(232,200,122,0.13)'],
+  [5,  0, 16, 'B4',  'rgba(255,124,92,0.13)'], [5, 17, 33, 'B5', 'rgba(196,122,255,0.13)'], [5, 34, 49, 'B6', 'rgba(232,200,122,0.13)'],
+  [6,  0, 16, 'B4',  'rgba(255,124,92,0.13)'], [6, 17, 33, 'B5', 'rgba(196,122,255,0.13)'], [6, 34, 49, 'B6', 'rgba(232,200,122,0.13)'],
+  [7,  0, 16, 'B4',  'rgba(255,124,92,0.13)'], [7, 17, 33, 'B5', 'rgba(196,122,255,0.13)'], [7, 34, 49, 'B6', 'rgba(232,200,122,0.13)'],
 ];
 
 // Slot state machine: free → occupied → reserved → (for EV: free → charging → fault → free)
@@ -3425,33 +3539,26 @@ let pkSearchHighlight = null; // slot key to highlight
 
 // ── Sync resident directory parking assignments → pkSlotOwners ──
 function pkSyncOwners() {
-  // Clear all dynamically-set owners (keep permanent ones)
-  const PERMANENT = { '2-5-44': 'VISHRUTH', '2-2-24': 'ABILASH' };
-  // Reset to permanent
+  // Clear all owners — residents array is the single source of truth
   Object.keys(pkSlotOwners).forEach(function(k) { delete pkSlotOwners[k]; });
-  Object.assign(pkSlotOwners, PERMANENT);
 
   // Re-apply from residents array
-  var levelMap = { B1:0, B2:1, B3:2 };
   residents.forEach(function(r) {
     if (!r.parking) return;
-    // Expected format: "B1 A-001" or "B3 F-045"
     var m = r.parking.trim().match(/^B([123])\s+([A-Ha-h])-(\d+)$/i);
     if (!m) return;
-    var lvlIdx  = parseInt(m[1]) - 1;           // B1→0, B2→1, B3→2
-    var rowIdx  = m[2].toUpperCase().charCodeAt(0) - 65; // A→0 … H→7
-    var slotIdx = parseInt(m[3]) - 1;           // 1-indexed → 0-indexed
-    var key = lvlIdx + '-' + rowIdx + '-' + slotIdx;
-    pkSlotOwners[key] = r.name;
+    var lvlIdx  = parseInt(m[1]) - 1;
+    var rowIdx  = m[2].toUpperCase().charCodeAt(0) - 65;
+    var slotIdx = parseInt(m[3]) - 1;
+    pkSlotOwners[lvlIdx + '-' + rowIdx + '-' + slotIdx] = r.name;
   });
 
-  // Re-render current level if parking panel is visible
+  // Re-render if parking tab is visible
   if (document.getElementById('view-parking') &&
       document.getElementById('view-parking').style.display !== 'none') {
     pkRenderLevel(pkCurrentLevel);
   }
 }
-
 function pkGetSlotType(rowIdx, slotIdx) {
   if ((rowIdx === 0 || rowIdx === 7) && slotIdx < 10)        return 'ev';
   if ((rowIdx === 3 || rowIdx === 4) && slotIdx >= PK.SLOTS_PER_ROW - 8) return 'ev';
@@ -3585,12 +3692,12 @@ function pkRenderLevel(lvlIdx) {
   // Infra column
   html += `<rect x="6" y="40" width="76" height="420" rx="3" fill="#050c18" stroke="#0a1828"/>`;
   const infraItems = [
-    { y:44, icon:'🛗', label:'LIFT 1', c:'#00d4ff44' },
-    { y:104, icon:'🛗', label:'LIFT 2', c:'#00d4ff44' },
-    { y:230, icon:'⬆', label:'RAMP UP', c:'#ffd06044' },
-    { y:290, icon:'⬇', label:'RAMP DN', c:'#ffd06044' },
-    { y:356, icon:'🪜', label:'STAIR', c:'#2a507044' },
-    { y:404, icon:'🚨', label:'FIRE\nPNL', c:'#ff220044' },
+    { y:44, icon:'🛗', label:'LIFT 1', c:'rgba(0,212,255,0.27)' },
+    { y:104, icon:'🛗', label:'LIFT 2', c:'rgba(0,212,255,0.27)' },
+    { y:230, icon:'⬆', label:'RAMP UP', c:'rgba(255,208,96,0.27)' },
+    { y:290, icon:'⬇', label:'RAMP DN', c:'rgba(255,208,96,0.27)' },
+    { y:356, icon:'🪜', label:'STAIR', c:'rgba(42,80,112,0.27)' },
+    { y:404, icon:'🚨', label:'FIRE\nPNL', c:'rgba(255,34,0,0.27)' },
   ];
   infraItems.forEach(({y, icon, label, c}) => {
     html += `<rect x="10" y="${y}" width="68" height="52" rx="2" fill="#080e20" stroke="${c}" stroke-width="1.2"/>`;
@@ -3636,8 +3743,8 @@ function pkRenderLevel(lvlIdx) {
       else if (state==='fault')    faultC++;
       else takenC++;
 
-      const hlStroke  = owner ? '#ffd060' : isHighlighted ? 'rgba(255,255,255,1)' : style.stroke;
-      const hlFill    = owner ? '#ffd06018' : style.fill;
+      const hlStroke  = owner ? '#ffd060' : isHighlighted ? 'white' : style.stroke;
+      const hlFill    = owner ? 'rgba(255,208,96,0.09)' : style.fill;
       const hlSW      = isHighlighted ? '2.5' : style.sw;
       const hlFilter  = isHighlighted ? ' filter:brightness(2);' : '';
 
@@ -4035,7 +4142,7 @@ const HL_LAYOUTS = {
 function hlDrawFurniture(type, x, y, w, h) {
   if (!hlShowFurniture) return '';
   const parts = [];
-  const S = 'stroke="rgba(255,255,255,1)" stroke-width="0.8" fill="none" opacity=".2"';
+  const S = 'stroke="white" stroke-width="0.8" fill="none" opacity=".2"';
   const SF = function(c) { return 'stroke="' + c + '" stroke-width="0.8" fill="' + c + '" fill-opacity=".12" opacity=".4"'; };
   if (type === 'living') {
     const sx = x+14, sy = y+h-60;
@@ -4147,15 +4254,15 @@ function hlSunOverlay(room) {
   if (!sun) return '';
   const parts = [];
   if (sun.morning) {
-    parts.push('<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="#ffaa2208" rx="1" style="pointer-events:none"/>');
+    parts.push('<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="rgba(255,170,34,0.03)" rx="1" style="pointer-events:none"/>');
     parts.push('<text x="' + (room.x+8) + '" y="' + (room.y+room.h-6) + '" font-family="Share Tech Mono" font-size="6" fill="#ffaa22" opacity=".5">🌅 AM</text>');
   }
   if (sun.evening) {
-    parts.push('<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="#ff660808" rx="1" style="pointer-events:none"/>');
+    parts.push('<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="rgba(255,102,8,0.03)" rx="1" style="pointer-events:none"/>');
     parts.push('<text x="' + (room.x+8) + '" y="' + (room.y+room.h-6) + '" font-family="Share Tech Mono" font-size="6" fill="#ff9944" opacity=".5">🌇 PM</text>');
   }
   if (sun.afternoon) {
-    parts.push('<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="#ffdd0008" rx="1" style="pointer-events:none"/>');
+    parts.push('<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="rgba(255,221,0,0.03)" rx="1" style="pointer-events:none"/>');
     parts.push('<text x="' + (room.x+8) + '" y="' + (room.y+room.h-6) + '" font-family="Share Tech Mono" font-size="6" fill="#ffdd00" opacity=".5">☀️ MID</text>');
   }
   return parts.join('\n');
@@ -4198,7 +4305,7 @@ function hlRenderInto(svgEl, typeKey, selectedSet, interactive) {
     const isSelected = selectedSet && selectedSet.has(idx);
     const fillColor = isSelected ? col.hi : col.fill;
     const strokeW = isSelected ? '2.5' : '1.5';
-    const rimColor = isSelected ? 'rgba(255,255,255,1)' : col.stroke;
+    const rimColor = isSelected ? 'white' : col.stroke;
 
     html += '<g id="hlr-' + typeKey + '-' + idx + '" style="cursor:pointer">';
     // Wall border (thick outer stroke acts as wall)
@@ -4221,7 +4328,7 @@ function hlRenderInto(svgEl, typeKey, selectedSet, interactive) {
     html += '<text x="' + (room.x+room.w/2) + '" y="' + (room.y+room.h/2+18) + '" text-anchor="middle"'
       + ' font-family="Share Tech Mono" font-size="' + fs3 + '" fill="' + col.label + '" opacity=".4">' + room.area + ' sq.ft</text>';
     if (isSelected) {
-      html += '<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="none" stroke="rgba(255,255,255,1)" stroke-width="2" stroke-dasharray="4,3" rx="0" style="pointer-events:none"/>';
+      html += '<rect x="' + room.x + '" y="' + room.y + '" width="' + room.w + '" height="' + room.h + '" fill="none" stroke="white" stroke-width="2" stroke-dasharray="4,3" rx="0" style="pointer-events:none"/>';
     }
     html += '</g>';
 
@@ -4785,7 +4892,8 @@ function dirRender(list, total, page, totalPages, perPage) {
     var photoCell = photoSrc
       ? '<img src="' + photoSrc + '" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #ffd06066;cursor:pointer;" onclick="resCardOpen(' + r.id + ')" />'
       : '<div style="width:28px;height:28px;border-radius:50%;background:#0a1420;border:1px solid #102030;display:flex;align-items:center;justify-content:center;font-size:.8rem;cursor:pointer;" onclick="resCardOpen(' + r.id + ')">&#128100;</div>';
-    return '<tr data-rid=' + r.id + '>'
+    return '<tr data-rid=' + r.id + ' style="cursor:default;">'
+      + '<td style="color:rgba(42,80,112,0.6);font-size:1rem;cursor:grab;user-select:none;text-align:center;" class="dir-drag-handle">&#8942;</td>'
       + '<td>' + photoCell + '</td>'
       + '<td style="color:#2a5070;">' + (i+1) + '</td>'
       + '<td style="font-weight:700;color:#ffd060;cursor:pointer;text-decoration:underline dotted #ffd06066;" data-action="profile" data-rid=' + r.id + '>' + r.name + '</td>'
@@ -4801,6 +4909,7 @@ function dirRender(list, total, page, totalPages, perPage) {
   }).join('');
 
   // ── Event delegation — one listener handles all buttons ──
+  dirInitDragDrop();
   tbody.onclick = function(e) {
     var tdEl = e.target.closest('td[data-action]');
     if (tdEl) { var a=tdEl.dataset.action,ri=parseInt(tdEl.dataset.rid); if(a==='profile'){resCardOpen(ri);return;} }
@@ -5065,6 +5174,7 @@ function initAll() {
 
   amenInitClicks();
   dirInit();
+  pkSyncOwners(); // sync resident parking assignments from localStorage on load
   // Wire edit panel buttons
   var epSave   = document.getElementById('ep-save-btn');
   var epCancel = document.getElementById('ep-cancel-btn');
@@ -5319,6 +5429,234 @@ function photoLightboxClose() {
     document.removeEventListener('keydown', document._lbKeyHandler);
     document._lbKeyHandler = null;
   }
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// OCCUPANCY CHART
+// ═══════════════════════════════════════════════════════════
+var BLOCKS    = ['B1','B2','B3','B4','B5','B6'];
+var FLOORS    = 20;
+var UNITS_PER_FLOOR = 10;
+var BLOCK_COLORS = { B1:'#00d4ff',B2:'#00e87a',B3:'#ffd060',B4:'#ff7c5c',B5:'#c47aff',B6:'#e8c87a' };
+
+function occRender() {
+  var grid    = document.getElementById('occ-grid');
+  var summary = document.getElementById('occ-summary');
+  var totLbl  = document.getElementById('occ-total-label');
+  if (!grid) return;
+
+  // Build occupancy map: occMap[block][floor] = count of occupied units
+  var occMap = {};
+  BLOCKS.forEach(function(b) {
+    occMap[b] = {};
+    for (var f = 1; f <= FLOORS; f++) occMap[b][f] = 0;
+  });
+  residents.forEach(function(r) {
+    if (occMap[r.block] && r.floor >= 1 && r.floor <= FLOORS) {
+      occMap[r.block][r.floor] = (occMap[r.block][r.floor] || 0) + 1;
+    }
+  });
+
+  // ── Build grid ──
+  var html = '';
+
+  // Header row: blank + block names
+  html += '<div class="occ-row-lbl"></div>';
+  BLOCKS.forEach(function(b) {
+    var bc = BLOCK_COLORS[b] || '#fff';
+    html += '<div class="occ-col-hdr" style="color:' + bc + ';">' + b + '</div>';
+  });
+
+  // Rows: floor 20 at top → floor 1 at bottom
+  for (var f = FLOORS; f >= 1; f--) {
+    // Floor label
+    var lbl = f === 20 ? 'PH' : f === 1 ? 'G' : f;
+    html += '<div class="occ-row-lbl">' + lbl + '</div>';
+    BLOCKS.forEach(function(b) {
+      var occ   = occMap[b][f] || 0;
+      var total = UNITS_PER_FLOOR;
+      var cls   = occ === 0 ? 'occ-vacant' : occ >= total ? 'occ-full' : 'occ-partial';
+      var label = occ > 0 ? occ + '/' + total : '';
+      var tip   = b + ' Floor ' + f + ': ' + occ + ' occupied, ' + (total - occ) + ' vacant';
+      html += '<div class="occ-cell ' + cls + '" title="' + tip + '">' + label + '</div>';
+    });
+  }
+  grid.innerHTML = html;
+
+  // ── Build summary cards ──
+  var totalOcc = 0, totalUnits = BLOCKS.length * FLOORS * UNITS_PER_FLOOR;
+  var sumHtml = '';
+  BLOCKS.forEach(function(b) {
+    var bc  = BLOCK_COLORS[b] || '#fff';
+    var occ = 0;
+    for (var f = 1; f <= FLOORS; f++) occ += (occMap[b][f] || 0);
+    var tot = FLOORS * UNITS_PER_FLOOR;
+    var pct = Math.round(occ / tot * 100);
+    totalOcc += occ;
+    sumHtml += '<div class="occ-sum-card" style="border-color:' + bc + '22;">'
+      + '<div class="occ-sum-name" style="color:' + bc + ';">' + b + '</div>'
+      + '<div class="occ-sum-bar-wrap"><div class="occ-sum-bar-fill" style="width:' + pct + '%;background:' + bc + ';"></div></div>'
+      + '<div class="occ-sum-stats">' + occ + ' occupied &nbsp;·&nbsp; ' + (tot - occ) + ' vacant</div>'
+      + '</div>';
+  });
+  summary.innerHTML = sumHtml;
+
+  if (totLbl) {
+    totLbl.textContent = totalOcc + ' of ' + totalUnits + ' units occupied ('
+      + Math.round(totalOcc / totalUnits * 100) + '%)';
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// DRAG & DROP ROW REORDERING
+// ═══════════════════════════════════════════════════════════
+var dndDragId = null;
+
+function dirInitDragDrop() {
+  var tbody = document.getElementById('dir-tbody');
+  if (!tbody || tbody._dndWired) return;
+  tbody._dndWired = true;
+
+  // Track whether mousedown started on the handle
+  var dndFromHandle = false;
+  tbody.addEventListener('mousedown', function(e) {
+    dndFromHandle = !!e.target.closest('.dir-drag-handle');
+    // Only make the row draggable when mousedown is on the handle
+    var tr = e.target.closest('tr[data-rid]');
+    if (tr) tr.draggable = !!dndFromHandle;
+  });
+
+  tbody.addEventListener('dragstart', function(e) {
+    if (!dndFromHandle) { e.preventDefault(); return; }
+    var tr = e.target.closest('tr[data-rid]');
+    if (!tr) return;
+    dndDragId = parseInt(tr.dataset.rid);
+    tr.classList.add('dnd-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(dndDragId));
+  });
+
+  tbody.addEventListener('dragend', function(e) {
+    tbody.querySelectorAll('tr').forEach(function(tr) {
+      tr.classList.remove('dnd-dragging', 'dnd-over');
+    });
+    dndDragId = null;
+  });
+
+  tbody.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    var tr = e.target.closest('tr[draggable]');
+    tbody.querySelectorAll('tr').forEach(function(r) { r.classList.remove('dnd-over'); });
+    if (tr && parseInt(tr.dataset.rid) !== dndDragId) tr.classList.add('dnd-over');
+  });
+
+  tbody.addEventListener('dragleave', function(e) {
+    var tr = e.target.closest('tr');
+    if (tr) tr.classList.remove('dnd-over');
+  });
+
+  tbody.addEventListener('drop', function(e) {
+    e.preventDefault();
+    var targetTr = e.target.closest('tr[draggable]');
+    if (!targetTr || !dndDragId) return;
+    var targetId = parseInt(targetTr.dataset.rid);
+    if (targetId === dndDragId) return;
+
+    // Reorder residents array
+    var fromIdx = residents.findIndex(function(r) { return r.id === dndDragId; });
+    var toIdx   = residents.findIndex(function(r) { return r.id === targetId; });
+    if (fromIdx < 0 || toIdx < 0) return;
+
+    // Insert dragged item before/after target based on mouse Y position
+    var rect = targetTr.getBoundingClientRect();
+    var after = e.clientY > rect.top + rect.height / 2;
+    var item = residents.splice(fromIdx, 1)[0];
+    var insertAt = residents.findIndex(function(r) { return r.id === targetId; });
+    if (after) insertAt += 1;
+    residents.splice(insertAt, 0, item);
+
+    dirSave();
+    dirFilter();
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT / IMPORT BACKUP
+// ═══════════════════════════════════════════════════════════
+function dirExport() {
+  var backup = {
+    version: 1,
+    exported: new Date().toISOString(),
+    residents: residents,
+    photos: {}
+  };
+  // Include photos
+  try {
+    var photos = JSON.parse(localStorage.getItem('nexusprime_photos') || '{}');
+    backup.photos = photos;
+  } catch(e) {}
+
+  var json = JSON.stringify(backup, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'nexusprime_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function dirImportClick() {
+  var inp = document.getElementById('dir-import-input');
+  if (inp) inp.click();
+}
+
+function dirImportFile(event) {
+  var file = event.target.files && event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var backup = JSON.parse(e.target.result);
+      if (!backup.residents || !Array.isArray(backup.residents)) {
+        alert('Invalid backup file — no residents data found.');
+        return;
+      }
+      var count = backup.residents.length;
+      if (!confirm('This will replace all current residents (' + residents.length + ') with ' + count + ' residents from the backup. Continue?')) return;
+
+      // Restore residents
+      residents = backup.residents;
+      dirNextId = Math.max.apply(null, residents.map(function(r) { return r.id || 0; }).concat([0])) + 1;
+      dirSave();
+
+      // Restore photos
+      if (backup.photos && typeof backup.photos === 'object') {
+        try { localStorage.setItem('nexusprime_photos', JSON.stringify(backup.photos)); } catch(e) {
+          alert('Residents restored but photos could not be saved (storage limit). Try importing without photos.');
+        }
+      }
+
+      // Refresh everything
+      dirCurrentPage = 1;
+      dirFilter();
+      pkSyncOwners();
+      if (typeof flUpdateFloor === 'function') flUpdateFloor(flCurrentFloor);
+
+      alert('Imported ' + count + ' residents successfully.');
+    } catch(err) {
+      alert('Failed to read backup file: ' + err.message);
+    }
+    // Reset so same file can be re-imported
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 </script>
