@@ -4833,8 +4833,20 @@ function amenInitClicks() {
 // ── Persistent resident storage via localStorage ──
 var DIR_STORAGE_KEY = 'nexusprime_residents';
 var DIR_DEFAULT = [
-  { id:1, name:'VISHRUTH', block:'B6', floor:20, unit:8, parking:'B3 F-045', phone:'' },
-  { id:2, name:'ABILASH',  block:'B6', floor:20, unit:7, parking:'B3 C-025', phone:'' },
+  { id:1,  name:'VISHRUTH',       block:'B6', floor:20, unit:8, parking:'B3 F-045', phone:'' },
+  { id:3,  name:'AMMA',           block:'B6', floor:20, unit:4, parking:'B3 E-025', phone:'' },
+  { id:2,  name:'APPA',           block:'B6', floor:20, unit:7, parking:'B3 C-025', phone:'' },
+  { id:4,  name:'VED',            block:'B6', floor:20, unit:2, parking:'B3 F-035', phone:'' },
+  { id:5,  name:'RENGA THATHA',   block:'B6', floor:2,  unit:8, parking:'B1 D-030', phone:'' },
+  { id:6,  name:'SANKAR THATHA',  block:'B6', floor:2,  unit:1, parking:'B1 F-040', phone:'' },
+  { id:7,  name:'JAYA PAATI',     block:'B6', floor:2,  unit:2, parking:'B1 C-015', phone:'' },
+  { id:8,  name:'DEEKSHITHA',     block:'B6', floor:19, unit:7, parking:'B2 D-030', phone:'' },
+  { id:9,  name:'KOUSIK MAMA',    block:'B6', floor:19, unit:8, parking:'B2 E-006', phone:'' },
+  { id:10, name:'VEENA MAMI',     block:'B6', floor:19, unit:9, parking:'B2 A-027', phone:'' },
+  { id:11, name:'VISHWA ANNA',    block:'B6', floor:19, unit:2, parking:'B2 H-040', phone:'' },
+  { id:12, name:'NIVI AKKA',      block:'B6', floor:19, unit:3, parking:'B2 F-030', phone:'' },
+  { id:13, name:'KRITHI ATHAI',   block:'B6', floor:19, unit:4, parking:'B2 A-010', phone:'' },
+  { id:14, name:'NEELS ATHIMBER', block:'B6', floor:19, unit:5, parking:'B2 C-035', phone:'' },
 ];
 
 function dirLoad() {
@@ -5516,19 +5528,19 @@ var dndDragId = null;
 
 function dirInitDragDrop() {
   var tbody = document.getElementById('dir-tbody');
-  if (!tbody || tbody._dndWired) return;
-  tbody._dndWired = true;
+  if (!tbody) return;
 
-  // Track whether mousedown started on the handle
+  // Remove previous listeners before re-attaching
+  if (tbody._dndOff) tbody._dndOff();
+
   var dndFromHandle = false;
-  tbody.addEventListener('mousedown', function(e) {
-    dndFromHandle = !!e.target.closest('.dir-drag-handle');
-    // Only make the row draggable when mousedown is on the handle
-    var tr = e.target.closest('tr[data-rid]');
-    if (tr) tr.draggable = !!dndFromHandle;
-  });
 
-  tbody.addEventListener('dragstart', function(e) {
+  function onMousedown(e) {
+    dndFromHandle = !!e.target.closest('.dir-drag-handle');
+    var tr = e.target.closest('tr[data-rid]');
+    if (tr) tr.draggable = dndFromHandle;
+  }
+  function onDragstart(e) {
     if (!dndFromHandle) { e.preventDefault(); return; }
     var tr = e.target.closest('tr[data-rid]');
     if (!tr) return;
@@ -5536,57 +5548,60 @@ function dirInitDragDrop() {
     tr.classList.add('dnd-dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', String(dndDragId));
-  });
-
-  tbody.addEventListener('dragend', function(e) {
+  }
+  function onDragend() {
     tbody.querySelectorAll('tr').forEach(function(tr) {
       tr.classList.remove('dnd-dragging', 'dnd-over');
     });
     dndDragId = null;
-  });
-
-  tbody.addEventListener('dragover', function(e) {
+  }
+  function onDragover(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    var tr = e.target.closest('tr[draggable]');
+    var tr = e.target.closest('tr[data-rid]');
     tbody.querySelectorAll('tr').forEach(function(r) { r.classList.remove('dnd-over'); });
     if (tr && parseInt(tr.dataset.rid) !== dndDragId) tr.classList.add('dnd-over');
-  });
-
-  tbody.addEventListener('dragleave', function(e) {
+  }
+  function onDragleave(e) {
     var tr = e.target.closest('tr');
     if (tr) tr.classList.remove('dnd-over');
-  });
-
-  tbody.addEventListener('drop', function(e) {
+  }
+  function onDrop(e) {
     e.preventDefault();
-    var targetTr = e.target.closest('tr[draggable]');
+    var targetTr = e.target.closest('tr[data-rid]');
     if (!targetTr || !dndDragId) return;
     var targetId = parseInt(targetTr.dataset.rid);
     if (targetId === dndDragId) return;
-
-    // Reorder residents array
     var fromIdx = residents.findIndex(function(r) { return r.id === dndDragId; });
-    var toIdx   = residents.findIndex(function(r) { return r.id === targetId; });
-    if (fromIdx < 0 || toIdx < 0) return;
-
-    // Insert dragged item before/after target based on mouse Y position
-    var rect = targetTr.getBoundingClientRect();
-    var after = e.clientY > rect.top + rect.height / 2;
+    if (fromIdx < 0) return;
     var item = residents.splice(fromIdx, 1)[0];
-    var insertAt = residents.findIndex(function(r) { return r.id === targetId; });
-    if (after) insertAt += 1;
-    residents.splice(insertAt, 0, item);
-
+    var toIdx = residents.findIndex(function(r) { return r.id === targetId; });
+    if (toIdx < 0) { residents.splice(fromIdx, 0, item); return; }
+    var rect  = targetTr.getBoundingClientRect();
+    var after = e.clientY > rect.top + rect.height / 2;
+    residents.splice(after ? toIdx + 1 : toIdx, 0, item);
     dirSave();
     dirFilter();
-  });
+  }
+
+  tbody.addEventListener('mousedown', onMousedown);
+  tbody.addEventListener('dragstart', onDragstart);
+  tbody.addEventListener('dragend',   onDragend);
+  tbody.addEventListener('dragover',  onDragover);
+  tbody.addEventListener('dragleave', onDragleave);
+  tbody.addEventListener('drop',      onDrop);
+
+  // Store cleanup function
+  tbody._dndOff = function() {
+    tbody.removeEventListener('mousedown', onMousedown);
+    tbody.removeEventListener('dragstart', onDragstart);
+    tbody.removeEventListener('dragend',   onDragend);
+    tbody.removeEventListener('dragover',  onDragover);
+    tbody.removeEventListener('dragleave', onDragleave);
+    tbody.removeEventListener('drop',      onDrop);
+  };
 }
 
-
-// ═══════════════════════════════════════════════════════════
-// EXPORT / IMPORT BACKUP
-// ═══════════════════════════════════════════════════════════
 function dirExport() {
   var backup = {
     version: 1,
