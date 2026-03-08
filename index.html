@@ -4854,10 +4854,17 @@ function dirLoad() {
     var raw = localStorage.getItem(DIR_STORAGE_KEY);
     if (raw) {
       var parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      // If stored data has fewer residents than the baked-in defaults,
+      // the HTML has been updated — replace stale cache with new defaults
+      if (Array.isArray(parsed) && parsed.length >= DIR_DEFAULT.length) {
+        return parsed;
+      }
     }
   } catch(e) {}
-  return DIR_DEFAULT.map(function(r) { return Object.assign({}, r); });
+  // Seed from defaults and immediately persist so future adds are saved
+  var seeded = DIR_DEFAULT.map(function(r) { return Object.assign({}, r); });
+  try { localStorage.setItem(DIR_STORAGE_KEY, JSON.stringify(seeded)); } catch(e) {}
+  return seeded;
 }
 
 function dirSave() {
