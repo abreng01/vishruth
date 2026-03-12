@@ -294,6 +294,25 @@
   #dir-tbody tr.dnd-over td { background:rgba(0,212,255,0.06); }
   #dir-tbody tr.dnd-dragging { opacity:0.4; }
   .dir-drag-handle:hover { color:rgba(0,212,255,0.8) !important; }
+
+  /* ── EV Toggle Context Menu ── */
+  #pk-ev-menu {
+    position:fixed; z-index:8000; display:none;
+    background:#060d18; border:1px solid rgba(0,232,122,0.5);
+    border-radius:5px; padding:4px 0; min-width:160px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.6);
+  }
+  #pk-ev-menu .ev-menu-header {
+    font-family:var(--ff-mono); font-size:.52rem; color:rgba(0,232,122,0.6);
+    letter-spacing:.12em; padding:5px 12px 4px; border-bottom:1px solid #0a1820;
+  }
+  #pk-ev-menu button {
+    display:block; width:100%; background:none; border:none;
+    color:#c0d8f0; font-family:var(--ff-mono); font-size:.6rem;
+    padding:7px 12px; cursor:pointer; text-align:left; letter-spacing:.04em;
+  }
+  #pk-ev-menu button:hover { background:rgba(0,232,122,0.08); color:#00e87a; }
+  #pk-ev-menu .ev-menu-sep { border-top:1px solid #0a1820; margin:3px 0; }
   /* ── Resident Profile Card ── */
   #res-card {
     position:fixed; right:-420px; top:50%; transform:translateY(-50%);
@@ -3535,6 +3554,8 @@ const pkSlotOwners = {
   '2-5-44': 'VISHRUTH',   // F-045 · B3 Lower Basement (permanent)
   '2-2-24': 'ABILASH',    // C-025 · B3 Lower Basement (permanent)
 };
+var pkSlotEV = {};  // key → true=EV, false=non-EV (overrides default)
+const PK_EV_KEY = 'nexusprime_pk_ev';
 let pkSearchHighlight = null; // slot key to highlight
 
 // ── Sync resident directory parking assignments → pkSlotOwners ──
@@ -3560,6 +3581,15 @@ function pkSyncOwners() {
   }
 }
 function pkGetSlotType(rowIdx, slotIdx) {
+  // Per-slot EV override takes priority
+  var key = pkSlotKey(pkCurrentLevel, rowIdx, slotIdx);
+  if (pkSlotEV[key] === true)  return 'ev';
+  if (pkSlotEV[key] === false) {
+    // Explicitly removed — skip hardcoded EV rules, fall through to std/res
+    if ((rowIdx === 1 || rowIdx === 6) && slotIdx >= PK.SLOTS_PER_ROW - 2) return 'res';
+    return 'std';
+  }
+  // Default hardcoded layout
   if ((rowIdx === 0 || rowIdx === 7) && slotIdx < 10)        return 'ev';
   if ((rowIdx === 3 || rowIdx === 4) && slotIdx >= PK.SLOTS_PER_ROW - 8) return 'ev';
   if ((rowIdx === 1 || rowIdx === 6) && slotIdx < 5)         return 'ev';
@@ -3752,6 +3782,7 @@ function pkRenderLevel(lvlIdx) {
         fill="${hlFill || style.fill}" stroke="${hlStroke}" stroke-width="${hlSW}"
         style="cursor:pointer;${hlFilter}"
         onclick="pkCycleState('${key}','${stype}'); pkSearchHighlight='${key}'; var _s=document.getElementById('pk-svg'); if(_s)pkDrawPath(_s,${lvlIdx},${ri},${si});"
+        oncontextmenu="pkEVMenuOpen(event,'${key}','${stype}')"
         onmouseenter="pkShowTip(event,'${slotId}','${stype}','${state}','${blk.lbl}',${lvlIdx})"
         onmousemove="pkMoveTip(event)"
         onmouseleave="pkHideTip()"/>`;
@@ -3852,12 +3883,12 @@ function pkShowTip(e, slotId, stype, state, block, lvlIdx) {
   });
   const ownerLabel = ownerFromKey ? pkSlotOwners[ownerFromKey] : null;
   document.getElementById('tt-note').textContent = ownerLabel
-    ? `🔒 Assigned to ${ownerLabel} · Permanent allocation`
+    ? `🔒 Assigned to ${ownerLabel} · Right-click to toggle EV`
     : stype === 'ev'
-    ? 'Click to cycle: Free → Charging → Fault'
+    ? 'Left-click: cycle state · Right-click: remove EV'
     : stype === 'res'
-    ? 'Click to toggle occupied'
-    : 'Click to cycle: Free → Occupied → Reserved';
+    ? 'Click to toggle occupied · Right-click to mark EV'
+    : 'Left-click: cycle state · Right-click: mark as EV';
   tt.style.left = (e.clientX+16)+'px';
   tt.style.top  = (e.clientY-10)+'px';
   tt.classList.add('show');
@@ -5188,6 +5219,7 @@ function initAll() {
   const firstBtn = document.querySelector('.tab-btn');
   if (firstBtn) switchTab('full', firstBtn);
   flInit();
+  pkLoadEV();
   pkRenderLevel(0);
   hlInit();
 
@@ -5681,6 +5713,73 @@ function dirImportFile(event) {
   reader.readAsText(file);
 }
 
+
+// ═══════════════════════════════════════════════════════════
+// EV SLOT TOGGLE
+// ═══════════════════════════════════════════════════════════
+function pkLoadEV() {
+  try {
+    var raw = localStorage.getItem(PK_EV_KEY);
+    if (raw) pkSlotEV = JSON.parse(raw);
+  } catch(e) { pkSlotEV = {}; }
+}
+
+function pkSaveEV() {
+  try { localStorage.setItem(PK_EV_KEY, JSON.stringify(pkSlotEV)); } catch(e) {}
+}
+
+var _pkEVMenuKey  = null;
+var _pkEVMenuType = null;
+
+function pkEVMenuOpen(e, key, currentType) {
+  e.preventDefault();
+  e.stopPropagation();
+  _pkEVMenuKey  = key;
+  _pkEVMenuType = currentType;
+  var menu    = document.getElementById('pk-ev-menu');
+  var btn     = document.getElementById('pk-ev-toggle-btn');
+  var title   = document.getElementById('pk-ev-menu-title');
+  var isEV    = (currentType === 'ev');
+  title.textContent = 'SLOT ' + key.split('-').join('/');
+  btn.textContent   = isEV ? '🔋 Remove EV (make Standard)' : '⚡ Mark as EV';
+  btn.style.color   = isEV ? '#ff7c5c' : '#00e87a';
+  // Position near cursor, keep on screen
+  var x = Math.min(e.clientX, window.innerWidth  - 180);
+  var y = Math.min(e.clientY, window.innerHeight - 100);
+  menu.style.left    = x + 'px';
+  menu.style.top     = y + 'px';
+  menu.style.display = 'block';
+  // Close on outside click
+  setTimeout(function() {
+    document.addEventListener('click', pkEVMenuClose, { once: true });
+  }, 10);
+}
+
+function pkEVMenuClose() {
+  var menu = document.getElementById('pk-ev-menu');
+  if (menu) menu.style.display = 'none';
+  _pkEVMenuKey = null;
+}
+
+function pkEVToggleConfirm() {
+  if (!_pkEVMenuKey) return;
+  var isEV = (_pkEVMenuType === 'ev');
+  if (isEV) {
+    // Remove EV override — restore to default (std unless hardcoded EV)
+    pkSlotEV[_pkEVMenuKey] = false;
+  } else {
+    // Mark as EV
+    pkSlotEV[_pkEVMenuKey] = true;
+    // If slot was occupied/reserved, reset state so EV icon shows
+    if (pkSlotStates[_pkEVMenuKey] && pkSlotStates[_pkEVMenuKey] !== 'free') {
+      // keep state — just type changes, occupied EV is fine
+    }
+  }
+  pkSaveEV();
+  pkEVMenuClose();
+  pkRenderLevel(pkCurrentLevel);
+}
+
 </script>
 
 
@@ -5754,5 +5853,14 @@ function dirImportFile(event) {
       line-height:1;">&#10005;</button>
   </div>
 </div>
+
+<!-- EV Toggle Context Menu -->
+<div id="pk-ev-menu">
+  <div class="ev-menu-header" id="pk-ev-menu-title">SLOT OPTIONS</div>
+  <button id="pk-ev-toggle-btn" onclick="pkEVToggleConfirm()">⚡ Mark as EV</button>
+  <div class="ev-menu-sep"></div>
+  <button onclick="pkEVMenuClose()">✕ Cancel</button>
+</div>
+
 </body>
 </html>
