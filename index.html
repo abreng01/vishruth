@@ -295,6 +295,28 @@
   #dir-tbody tr.dnd-dragging { opacity:0.4; }
   .dir-drag-handle:hover { color:rgba(0,212,255,0.8) !important; }
 
+
+  /* ── JSONBin sync overlay ── */
+  #jb-overlay {
+    position:fixed; inset:0; z-index:99999;
+    background:rgba(3,6,8,0.92); display:flex;
+    flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  }
+  #jb-overlay.hidden { display:none; }
+  .jb-spinner {
+    width:36px; height:36px; border:3px solid #0a1828;
+    border-top-color:#ffd060; border-radius:50%;
+    animation:jb-spin .8s linear infinite;
+  }
+  @keyframes jb-spin { to { transform:rotate(360deg); } }
+  .jb-msg {
+    font-family:var(--ff-mono); font-size:.65rem;
+    color:#c0d8f0; letter-spacing:.1em;
+  }
+  .jb-err {
+    font-family:var(--ff-mono); font-size:.6rem;
+    color:#ff4060; max-width:320px; text-align:center;
+  }
   /* ── EV Toggle Context Menu ── */
   #pk-ev-menu {
     position:fixed; z-index:8000; display:none;
@@ -4880,26 +4902,85 @@ var DIR_DEFAULT = [
   { id:14, name:'NEELS ATHIMBER', block:'B6', floor:19, unit:5, parking:'B2 C-035', phone:'' },
 ];
 
+// JSONBin config
+var JB_BIN_ID  = '69be0b5ab7ec241ddc8a5c68';
+var JB_API_KEY = '$2a$10$Zfg.CTiRPs3aPzAyNmMcpuJvkjWHNx9iS4I8qP1/qSZk7xUUqIM5.';
+var JB_URL     = 'https://api.jsonbin.io/v3/b/' + JB_BIN_ID;
+var JB_HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': JB_API_KEY };
+var jbSaveTimer = null;
+
 function dirLoad() {
+  // Return cached localStorage while JSONBin loads asynchronously
   try {
     var raw = localStorage.getItem(DIR_STORAGE_KEY);
     if (raw) {
       var parsed = JSON.parse(raw);
-      // If stored data has fewer residents than the baked-in defaults,
-      // the HTML has been updated — replace stale cache with new defaults
-      if (Array.isArray(parsed) && parsed.length >= DIR_DEFAULT.length) {
-        return parsed;
-      }
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch(e) {}
-  // Seed from defaults and immediately persist so future adds are saved
-  var seeded = DIR_DEFAULT.map(function(r) { return Object.assign({}, r); });
-  try { localStorage.setItem(DIR_STORAGE_KEY, JSON.stringify(seeded)); } catch(e) {}
-  return seeded;
+  return DIR_DEFAULT.map(function(r) { return Object.assign({}, r); });
+}
+
+function jbLoad() {
+  var overlay = document.getElementById('jb-overlay');
+  var msg     = document.getElementById('jb-msg');
+  var errEl   = document.getElementById('jb-err');
+  if (overlay) overlay.classList.remove('hidden');
+  if (msg)     msg.textContent = 'LOADING RESIDENT DATA…';
+  if (errEl)   errEl.textContent = '';
+
+  fetch(JB_URL + '/latest', { headers: { 'X-Master-Key': JB_API_KEY } })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      var remote = data.record && data.record.residents;
+      if (Array.isArray(remote) && remote.length > 0) {
+        // Remote has data — use it and update local cache
+        residents  = remote;
+        dirNextId  = Math.max.apply(null, residents.map(function(r){ return r.id||0; }).concat([0])) + 1;
+        try { localStorage.setItem(DIR_STORAGE_KEY, JSON.stringify(residents)); } catch(e) {}
+      } else {
+        // Remote empty — push local/default data up to JSONBin
+        if (msg) msg.textContent = 'SYNCING LOCAL DATA…';
+        jbPush();
+      }
+      if (overlay) overlay.classList.add('hidden');
+      dirCurrentPage = 1;
+      dirFilter();
+      pkSyncOwners();
+      if (typeof occRender === 'function') occRender();
+    })
+    .catch(function(err) {
+      // Network error — fall back to localStorage silently
+      console.warn('JSONBin load failed, using local cache:', err);
+      if (overlay) overlay.classList.add('hidden');
+      dirCurrentPage = 1;
+      dirFilter();
+      pkSyncOwners();
+    });
+}
+
+function jbPush() {
+  // Fire-and-forget push, no UI block
+  fetch(JB_URL, {
+    method:  'PUT',
+    headers: JB_HEADERS,
+    body:    JSON.stringify({ residents: residents })
+  }).then(function(r) {
+    if (!r.ok) console.warn('JSONBin save failed: HTTP ' + r.status);
+  }).catch(function(e) {
+    console.warn('JSONBin save error:', e);
+  });
 }
 
 function dirSave() {
+  // Always update local cache immediately
   try { localStorage.setItem(DIR_STORAGE_KEY, JSON.stringify(residents)); } catch(e) {}
+  // Debounce JSONBin push — 1.5s after last change
+  if (jbSaveTimer) clearTimeout(jbSaveTimer);
+  jbSaveTimer = setTimeout(jbPush, 1500);
 }
 
 var residents = dirLoad();
@@ -5248,6 +5329,9 @@ function initAll() {
       }
     });
   }
+
+  // Load from JSONBin — updates UI once remote data arrives
+  jbLoad();
 }
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initAll);
@@ -5860,6 +5944,14 @@ function pkEVToggleConfirm() {
   <button id="pk-ev-toggle-btn" onclick="pkEVToggleConfirm()">⚡ Mark as EV</button>
   <div class="ev-menu-sep"></div>
   <button onclick="pkEVMenuClose()">✕ Cancel</button>
+</div>
+
+
+<!-- JSONBin sync overlay -->
+<div id="jb-overlay">
+  <div class="jb-spinner"></div>
+  <div class="jb-msg" id="jb-msg">LOADING RESIDENT DATA…</div>
+  <div class="jb-err" id="jb-err"></div>
 </div>
 
 </body>
