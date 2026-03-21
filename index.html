@@ -2668,7 +2668,7 @@
     </div>
     <!-- Current floor info -->
     <div style="background:#060d18;border:1px solid #102030;border-radius:6px;padding:14px 20px;flex:1;display:flex;align-items:center;gap:20px;">
-      <span id="flFloorLabel" style="font-family:var(--ff-head);font-size:1rem;font-weight:700;color:#ffd060;letter-spacing:.08em;text-transform:uppercase;">Floor 01 — Ground Level</span>
+      <span id="flFloorLabel" style="font-family:var(--ff-head);font-size:1rem;font-weight:700;color:#ffd060;letter-spacing:.08em;text-transform:uppercase;">Floor 01</span>
       <span id="flBlockDesc" style="font-family:var(--ff-mono);font-size:.6rem;color:#2a5070;"></span>
     </div>
   </div>
@@ -3464,7 +3464,7 @@ function flUpdateFloor(floor) {
   floor = parseInt(floor);
   flCurrentFloor = floor;
   const cfg = BLOCK_CONFIGS[flCurrentBlock];
-  const titles = {1:'Ground Level', 2:'Mezzanine', 20:'Penthouse Level'};
+  const titles = {20:'Penthouse Level'};
   const suf = titles[floor] ? ' — ' + titles[floor] : '';
   const lbl = document.getElementById('flFloorLabel');
   if (lbl) lbl.textContent = `Floor ${String(floor).padStart(2,'0')}${suf}  ·  ${flCurrentBlock}`;
@@ -3475,14 +3475,14 @@ function flUpdateFloor(floor) {
     // Rows are prepended so index 0 = floor 20, index 19 = floor 1
     el.style.background = (20 - i) === floor ? '#00d4ff' : '#102030';
   });
-  // Top row
+  // Top row — units 06-10
   const topRow = document.getElementById('flTopRow');
   topRow.innerHTML = '';
-  cfg.top.forEach((u, i) => topRow.appendChild(flBuildUnit(flCurrentBlock, floor, i+1, u, 'top')));
-  // Bottom row
+  cfg.bot.forEach((u, i) => topRow.appendChild(flBuildUnit(flCurrentBlock, floor, i+6, u, 'top')));
+  // Bottom row — units 01-05
   const botRow = document.getElementById('flBottomRow');
   botRow.innerHTML = '';
-  cfg.bot.forEach((u, i) => botRow.appendChild(flBuildUnit(flCurrentBlock, floor, i+6, u, 'bot')));
+  cfg.top.forEach((u, i) => botRow.appendChild(flBuildUnit(flCurrentBlock, floor, i+1, u, 'bot')));
 }
 
 function flSelectBlock(blockId, btn) {
@@ -3501,7 +3501,7 @@ function flInit() {
   for (let f = 1; f <= 20; f++) {
     const opt = document.createElement('option');
     opt.value = f;
-    opt.textContent = `Floor ${String(f).padStart(2,'0')}${f===1?' — Ground':f===20?' — Penthouse':''}`;
+    opt.textContent = `Floor ${String(f).padStart(2,'0')}${f===20?' — Penthouse':''}`;
     sel.appendChild(opt);
     // Mini-map row (column-reverse so floor 1 at bottom)
     const row = document.createElement('div');
@@ -3651,6 +3651,7 @@ function pkCycleState(key, stype) {
 }
 
 function pkGetSlotStyle(stype, state) {
+  if (state === 'occupied' && stype === 'ev') return { fill:'#0a2018', stroke:'#00e87a', sw:'1.4' };
   if (state === 'occupied') return { fill:'#200808', stroke:'#ff4060', sw:'1.2' };
   if (state === 'reserved') return { fill:'#1a0e08', stroke:'#ff8844', sw:'1.2' };
   if (state === 'charging') return { fill:'#1a1200', stroke:'#ffaa00', sw:'1.4' };
@@ -3795,8 +3796,14 @@ function pkRenderLevel(lvlIdx) {
       else if (state==='fault')    faultC++;
       else takenC++;
 
-      const hlStroke  = owner ? '#ffd060' : isHighlighted ? 'white' : style.stroke;
-      const hlFill    = owner ? 'rgba(255,208,96,0.09)' : style.fill;
+      // EV + owner: green border to show EV status, gold fill for owner
+      const hlStroke  = owner && stype==='ev' ? '#00e87a'
+                      : owner                 ? '#ffd060'
+                      : isHighlighted         ? 'white'
+                      : style.stroke;
+      const hlFill    = owner && stype==='ev' ? 'rgba(0,232,122,0.1)'
+                      : owner                 ? 'rgba(255,208,96,0.09)'
+                      : style.fill;
       const hlSW      = isHighlighted ? '2.5' : style.sw;
       const hlFilter  = isHighlighted ? ' filter:brightness(2);' : '';
 
@@ -5358,7 +5365,7 @@ function resCardOpen(id) {
   av.style.borderColor = bc;
   document.getElementById('rc-block').textContent   = r.block;
   document.getElementById('rc-block').style.color   = bc;
-  document.getElementById('rc-floor').textContent   = 'Floor ' + r.floor + (r.floor === 20 ? ' — Penthouse' : r.floor === 1 ? ' — Ground' : '');
+  document.getElementById('rc-floor').textContent   = 'Floor ' + r.floor + (r.floor === 20 ? ' — Penthouse' : '');
   document.getElementById('rc-unit').textContent    = 'Unit ' + r.unit;
   document.getElementById('rc-phone').textContent   = r.phone   || '—';
   var pkEl = document.getElementById('rc-parking');
