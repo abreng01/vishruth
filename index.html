@@ -474,7 +474,7 @@
        Ctr-left  x=366–646:  Senior y=228–344  |  Clubhouse y=352–512  |  Amphitheatre y=516–584  |  Kids y=588–752
        N-S corr  x=496–542:  y=208–768
        Ctr-right x=660–910:  Library y=228–456  |  Playground y=470–752
-       Right col x=924–1242: Cricket y=228–752
+       Right col x=924–1242: Sports courts y=228–752
        Berm strip x=840–924: y=228–752
   ====================================================================== -->
 
@@ -489,9 +489,12 @@
       <linearGradient id="grassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" style="stop-color:#071a0e"/><stop offset="100%" style="stop-color:#040e08"/>
       </linearGradient>
-      <radialGradient id="cricketGrad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" style="stop-color:#0e2a16"/><stop offset="70%" style="stop-color:#071610"/><stop offset="100%" style="stop-color:#040e08"/>
-      </radialGradient>
+      <linearGradient id="footballGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#061808"/><stop offset="50%" style="stop-color:#081e0a"/><stop offset="100%" style="stop-color:#061808"/>
+      </linearGradient>
+      <linearGradient id="tennisGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#06101a"/><stop offset="100%" style="stop-color:#040c14"/>
+      </linearGradient>
       <linearGradient id="poolGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" style="stop-color:#003050"/><stop offset="100%" style="stop-color:#001828"/>
       </linearGradient>
@@ -540,7 +543,7 @@
     <!-- ═══════════════════ PET WALK LOOP (inner amenity belt perimeter) ═══════════════════ -->
     <!-- Rect (52,219)→(1249,755): sits in the gap between roads and amenity zones on all 4 sides -->
     <!-- North gap: road y=214 → amenity y=228 · South gap: amenity y=752 → road y=758 -->
-    <!-- West gap: road → wellness x=62 · East gap: cricket x=1242 → road -->
+    <!-- West gap: road → wellness x=62 · East gap: sports courts x=1242 → road -->
     <!-- 1.73km per lap. Conflict-checked clear of all 12 amenity zones. -->
     
 
@@ -678,7 +681,7 @@
           fill="#ffd06066" letter-spacing="1">COVERED PROMENADE</text>
 
     <!-- ═══════════════════ WATER STREAM ═══════════════════ -->
-    <!-- Winding stream from pool area through plaza to cricket zone -->
+    <!-- Winding stream from pool area through plaza to sports zone -->
     <path d="M352,400 Q390,390 420,410 Q450,430 480,420 Q510,415 540,425 Q580,440 620,430 Q660,420 700,440 Q740,460 780,450 Q820,440 840,460"
           fill="none" stroke="#00cfff" stroke-width="5" opacity=".12"/>
     <path d="M352,400 Q390,390 420,410 Q450,430 480,420 Q510,415 540,425 Q580,440 620,430 Q660,420 700,440 Q740,460 780,450 Q820,440 840,460"
@@ -969,7 +972,7 @@
     <!-- x=660-910, y=228-456 -->
     <g class="amenity-zone" id="amen-lib" style="cursor:pointer"
        data-name="Library & Reading Room" data-area="500 m²" data-capacity="60 readers"
-       data-hours="7AM–9PM" data-note="Quiet zone · near Cricket Ground · E-Library + Reading Room">
+       data-hours="7AM–9PM" data-note="Quiet zone · near Sports Courts · E-Library + Reading Room">
       <!-- width=172: x=660→832, 8px gap before berm at x=840 -->
       <rect x="660" y="228" width="172" height="228" rx="5" fill="#00101c" stroke="#00cfff33" stroke-width="1.5"/>
       <rect x="660" y="228" width="172" height="22" rx="5" fill="#00cfff18"/>
@@ -1012,7 +1015,7 @@
         <rect x="757" y="392" width="12" height="5" rx="1"/><rect x="775" y="392" width="12" height="5" rx="1"/>
       </g>
       <text x="746" y="406" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#00cfff44" letter-spacing="1">E-LIBRARY · READING ROOM</text>
-      <text x="746" y="446" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#00cfff33">quiet zone · near cricket</text>
+      <text x="746" y="446" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#00cfff33">quiet zone · near sports courts</text>
       <rect x="660" y="228" width="172" height="228" rx="5" fill="none" stroke="#00cfff44" stroke-width=".5"/>
     </g>
 
@@ -1051,7 +1054,7 @@
     </g>
 
     <!-- ═══════════════════ ACOUSTIC BERM ═══════════════════ -->
-    <!-- x=840-922, y=228-752 — narrow buffer strip between playground/library and cricket -->
+    <!-- x=840-922, y=228-752 — narrow buffer strip between playground/library and sports courts -->
     <g id="acoustic-berm">
       <!-- Berm fill -->
       <rect x="840" y="228" width="82" height="524" rx="4" fill="#0a1808" stroke="#00e87a22" stroke-width="1"/>
@@ -1079,46 +1082,93 @@
         <circle cx="876" cy="704" r="9" fill="#1e5a20" stroke="#2a7030" stroke-width="1"/>
         <circle cx="858" cy="732" r="8" fill="#1a5018" stroke="#2a6828" stroke-width="1"/>
       </g>
-      <text x="881" y="490" text-anchor="middle" font-family="Share Tech Mono" font-size="6"
-            fill="#00e87a55" transform="rotate(90 881 490)" letter-spacing="1">ACOUSTIC BERM · PLANTED EARTH MOUND</text>
+      <text x="881" y="490" font-family="Share Tech Mono" font-size="6" fill="#00e87a55" transform="rotate(90 881 490)" letter-spacing="1">ACOUSTIC BERM · PLANTED EARTH MOUND</text>
     </g>
 
-    <!-- ═══════════════════ AMENITY 11: CRICKET GROUND ═══════════════════ -->
-    <!-- x=924-1242, y=228-752 -->
-    <g class="amenity-zone" id="amen-cricket" style="cursor:pointer"
-       data-name="Cricket Ground" data-area="~5,000 m²" data-capacity="22 players + 400 spectators"
-       data-hours="6AM–8PM" data-note="Bottom-right corner · acoustic berm on west side · natural turf">
-      <rect x="924" y="228" width="318" height="524" rx="5" fill="#06100a" stroke="#00e87a44" stroke-width="1.5"/>
-      <rect x="924" y="228" width="318" height="22" rx="5" fill="#00e87a18"/>
-      <text x="1083" y="243" text-anchor="middle" font-family="Rajdhani" font-size="11" font-weight="700" fill="#00e87a" letter-spacing="1.5">🏏 CRICKET GROUND</text>
+    <!-- ═══════════════════ AMENITY 11: FOOTBALL COURT ═══════════════════ -->
+    <!-- x=924-1242, y=228-486 -->
+    <g class="amenity-zone" id="amen-football" style="cursor:pointer"
+       data-name="Football Court" data-area="~2,200 m²" data-capacity="10 players (5-a-side)"
+       data-hours="6AM–9PM" data-note="5-a-side · floodlit · synthetic turf · east amenity zone">
+      <rect x="924" y="228" width="318" height="258" rx="5" fill="#06100a" stroke="#00e87a44" stroke-width="1.5"/>
+      <rect x="924" y="228" width="318" height="20" rx="5" fill="#00e87a18"/>
+      <text x="1083" y="243" text-anchor="middle" font-family="Rajdhani" font-size="11" font-weight="700" fill="#00e87a" letter-spacing="1.5">⚽ FOOTBALL COURT</text>
       <rect x="1178" y="229" width="56" height="14" rx="7" fill="#00e87a22" stroke="#00e87a" stroke-width=".8"/>
-      <text x="1206" y="239" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#00e87a">CORNER</text>
-      <!-- Oval field -->
-      <ellipse cx="1083" cy="480" rx="142" ry="208" fill="url(#cricketGrad)" stroke="#00e87a" stroke-width="1.8"/>
-      <ellipse cx="1083" cy="480" rx="142" ry="208" fill="url(#grassDots)" opacity=".3"/>
-      <ellipse cx="1083" cy="480" rx="84" ry="126" fill="none" stroke="#00e87a28" stroke-width="1" stroke-dasharray="5,4"/>
-      <!-- Pitch -->
-      <rect x="1067" y="422" width="32" height="116" rx="2" fill="#0b1e10" stroke="#00e87a55" stroke-width="1"/>
-      <line x1="1064" y1="440" x2="1102" y2="440" stroke="#00e87a66" stroke-width="1"/>
-      <line x1="1064" y1="520" x2="1102" y2="520" stroke="#00e87a66" stroke-width="1"/>
-      <g fill="#00e87a" opacity=".8">
-        <rect x="1077" y="433" width="2" height="7" rx="1"/><rect x="1082" y="433" width="2" height="7" rx="1"/><rect x="1087" y="433" width="2" height="7" rx="1"/>
-        <rect x="1077" y="521" width="2" height="7" rx="1"/><rect x="1082" y="521" width="2" height="7" rx="1"/><rect x="1087" y="521" width="2" height="7" rx="1"/>
-      </g>
-      <text x="1083" y="486" text-anchor="middle" font-size="18" opacity=".35">🏏</text>
-      <g fill="#00e87a35">
-        <circle cx="1083" cy="276" r="3"/><circle cx="1083" cy="684" r="3"/>
-        <circle cx="946" cy="480" r="3"/><circle cx="1220" cy="480" r="3"/>
-        <circle cx="963" cy="314" r="3"/><circle cx="1203" cy="314" r="3"/>
-        <circle cx="963" cy="646" r="3"/><circle cx="1203" cy="646" r="3"/>
-      </g>
-      <!-- Spectator ring -->
-      <ellipse cx="1083" cy="480" rx="142" ry="208" fill="none" stroke="#00e87a15" stroke-width="10"/>
-      <!-- Scoreboard -->
-      <rect x="934" y="700" width="298" height="16" rx="2" fill="#040c08" stroke="#00e87a1a" stroke-width=".8"/>
-      <text x="1083" y="711" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#00e87a44" letter-spacing="1">SCOREBOARD · SPECTATOR SEATING · 400 CAPACITY</text>
-      <!-- Acoustic berm note -->
-      <text x="936" y="730" font-family="Share Tech Mono" font-size="5.5" fill="#00e87a33" letter-spacing=".5">⛰ ACOUSTIC BERM ON WEST</text>
+      <text x="1206" y="239" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#00e87a">5-A-SIDE</text>
+      <!-- Pitch surface -->
+      <rect x="934" y="252" width="298" height="202" rx="2" fill="url(#footballGrad)" stroke="#00e87a" stroke-width="1.2"/>
+      <!-- Halfway line -->
+      <line x1="934" y1="353" x2="1232" y2="353" stroke="#00e87a" stroke-width=".8" opacity=".7"/>
+      <!-- Center circle + spot -->
+      <circle cx="1083" cy="353" r="24" fill="none" stroke="#00e87a" stroke-width=".8" opacity=".7"/>
+      <circle cx="1083" cy="353" r="2" fill="#00e87a" opacity=".8"/>
+      <!-- Penalty areas -->
+      <rect x="1016" y="252" width="134" height="30" rx="1" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".6"/>
+      <rect x="1016" y="424" width="134" height="30" rx="1" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".6"/>
+      <!-- 6-yard boxes -->
+      <rect x="1050" y="252" width="66" height="16" rx="1" fill="none" stroke="#00e87a" stroke-width=".6" opacity=".5"/>
+      <rect x="1050" y="438" width="66" height="16" rx="1" fill="none" stroke="#00e87a" stroke-width=".6" opacity=".5"/>
+      <!-- Penalty spots -->
+      <circle cx="1083" cy="270" r="1.5" fill="#00e87a" opacity=".7"/>
+      <circle cx="1083" cy="436" r="1.5" fill="#00e87a" opacity=".7"/>
+      <!-- Penalty arcs -->
+      <path d="M1059,282 A24,24 0 0,0 1107,282" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".5"/>
+      <path d="M1059,422 A24,24 0 0,1 1107,422" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".5"/>
+      <!-- Corner arcs -->
+      <path d="M934,257 A5,5 0 0,1 939,252" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".5"/>
+      <path d="M1227,252 A5,5 0 0,1 1232,257" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".5"/>
+      <path d="M934,449 A5,5 0 0,0 939,454" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".5"/>
+      <path d="M1227,454 A5,5 0 0,0 1232,449" fill="none" stroke="#00e87a" stroke-width=".7" opacity=".5"/>
+      <!-- Goals -->
+      <path d="M1067,252 L1067,246 L1099,246 L1099,252" fill="#00e87a18" stroke="#00e87a" stroke-width="1.2"/>
+      <path d="M1067,454 L1067,460 L1099,460 L1099,454" fill="#00e87a18" stroke="#00e87a" stroke-width="1.2"/>
+      <!-- Floodlight poles -->
+      <line x1="928" y1="252" x2="928" y2="244" stroke="#00e87a55" stroke-width="1"/>
+      <circle cx="928" cy="243" r="2" fill="#ffd060" opacity=".6"/>
+      <line x1="1238" y1="252" x2="1238" y2="244" stroke="#00e87a55" stroke-width="1"/>
+      <circle cx="1238" cy="243" r="2" fill="#ffd060" opacity=".6"/>
+      <line x1="928" y1="454" x2="928" y2="462" stroke="#00e87a55" stroke-width="1"/>
+      <circle cx="928" cy="463" r="2" fill="#ffd060" opacity=".6"/>
+      <line x1="1238" y1="454" x2="1238" y2="462" stroke="#00e87a55" stroke-width="1"/>
+      <circle cx="1238" cy="463" r="2" fill="#ffd060" opacity=".6"/>
+      <text x="1083" y="476" text-anchor="middle" font-family="Share Tech Mono" font-size="5.5" fill="#00e87a44" letter-spacing=".8">10 PLAYERS · FLOODLIT · SYNTHETIC TURF</text>
+      <rect x="924" y="228" width="318" height="258" rx="5" fill="none" stroke="#00e87a44" stroke-width=".5"/>
+    </g>
+
+    <!-- ═══════════════════ AMENITY 11B: TENNIS COURT ═══════════════════ -->
+    <!-- x=924-1242, y=492-752 -->
+    <g class="amenity-zone" id="amen-tennis" style="cursor:pointer"
+       data-name="Tennis Court" data-area="~670 m²" data-capacity="4 players (singles/doubles)"
+       data-hours="6AM–9PM" data-note="Hard court · floodlit · east amenity zone · next to football court">
+      <rect x="924" y="492" width="318" height="260" rx="5" fill="#060c18" stroke="#ffd06044" stroke-width="1.5"/>
+      <rect x="924" y="492" width="318" height="20" rx="5" fill="#ffd06018"/>
+      <text x="1083" y="507" text-anchor="middle" font-family="Rajdhani" font-size="11" font-weight="700" fill="#ffd060" letter-spacing="1.5">🎾 TENNIS COURT</text>
+      <rect x="1178" y="493" width="56" height="14" rx="7" fill="#ffd06022" stroke="#ffd060" stroke-width=".8"/>
+      <text x="1206" y="503" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#ffd060">HARD CRT</text>
+      <!-- Court surface -->
+      <rect x="940" y="516" width="286" height="218" rx="1" fill="#0a1422"/>
+      <!-- Court boundary -->
+      <rect x="940" y="516" width="286" height="218" rx="1" fill="none" stroke="#ffd060" stroke-width="1.2"/>
+      <!-- Singles sidelines -->
+      <line x1="953" y1="516" x2="953" y2="734" stroke="#ffd060" stroke-width=".7" opacity=".8"/>
+      <line x1="1213" y1="516" x2="1213" y2="734" stroke="#ffd060" stroke-width=".7" opacity=".8"/>
+      <!-- Net -->
+      <line x1="940" y1="625" x2="1226" y2="625" stroke="#ffd060" stroke-width="1.8" opacity=".9"/>
+      <rect x="1080" y="621" width="6" height="8" rx="1" fill="#ffd060" opacity=".6"/>
+      <circle cx="940" cy="625" r="3" fill="#ffd060" opacity=".7"/>
+      <circle cx="1226" cy="625" r="3" fill="#ffd060" opacity=".7"/>
+      <!-- Service lines -->
+      <line x1="953" y1="566" x2="1213" y2="566" stroke="#ffd060" stroke-width=".7" opacity=".7"/>
+      <line x1="953" y1="684" x2="1213" y2="684" stroke="#ffd060" stroke-width=".7" opacity=".7"/>
+      <!-- Center service line -->
+      <line x1="1083" y1="566" x2="1083" y2="684" stroke="#ffd060" stroke-width=".7" opacity=".7"/>
+      <!-- Doubles alleys shaded -->
+      <rect x="940" y="516" width="13" height="218" fill="#ffd06008"/>
+      <rect x="1213" y="516" width="13" height="218" fill="#ffd06008"/>
+      <text x="1083" y="622" text-anchor="middle" font-size="14" opacity=".2">🎾</text>
+      <text x="1083" y="744" text-anchor="middle" font-family="Share Tech Mono" font-size="5.5" fill="#ffd06044" letter-spacing=".8">4 PLAYERS · SINGLES + DOUBLES · FLOODLIT</text>
+      <rect x="924" y="492" width="318" height="260" rx="5" fill="none" stroke="#ffd06044" stroke-width=".5"/>
+    </g>font-size="5.5" fill="#00e87a33" letter-spacing=".5">⛰ ACOUSTIC BERM ON WEST</text>
       <rect x="924" y="228" width="318" height="524" rx="5" fill="none" stroke="#00e87a44" stroke-width=".5"/>
     </g>
 
@@ -1275,7 +1325,7 @@
     <!-- ── B6 Bottom-Right (INWARD + VERTICAL GARDEN) ── -->
     <g class="block-group" id="blk-B6" style="cursor:pointer"
        data-name="Block B6" data-units="200" data-floors="20" data-facing="North (Inward ↑)"
-       data-note="Inward facing · vertical garden · acoustic berm shields cricket noise · podium retail">
+       data-note="Inward facing · vertical garden · acoustic berm shields sports court noise · podium retail">
       <rect x="984" y="790" width="280" height="156" rx="5" fill="url(#blockGradInward)" stroke="#1a6080" stroke-width="2"/>
       <rect x="984" y="790" width="280" height="20" rx="5" fill="url(#solarPattern)" opacity=".8"/>
       <rect x="984" y="790" width="280" height="20" rx="5" fill="#ffd06006"/>
@@ -2575,7 +2625,8 @@
     <div class="legend-item"><div class="legend-box" style="background:#00101c;border:1.5px solid #00cfff44;"></div>📚 Library</div>
     <div class="legend-item"><div class="legend-box" style="background:#080e04;border:1.5px solid #ffd06044;"></div>⛹️ Open Playground</div>
     <div class="legend-item"><div class="legend-box" style="background:#0a1808;border:1.5px solid #00e87a22;"></div>⛰ Acoustic Berm</div>
-    <div class="legend-item"><div class="legend-box" style="background:#06100a;border:1.5px solid #00e87a;"></div>🏏 Cricket Ground</div>
+    <div class="legend-item"><div class="legend-box" style="background:#06100a;border:1.5px solid #00e87a;"></div>⚽ Football Court</div>
+    <div class="legend-item"><div class="legend-box" style="background:#060c18;border:1.5px solid #ffd060;"></div>🎾 Tennis Court</div>
     <div class="legend-item"><div class="legend-box" style="background:#001830;border:2px solid #00cfff44;"></div>💧 Water Stream + ⛲ Fountain</div>
     <div class="legend-item"><div class="legend-box" style="background:#ffd06008;border:1.5px dashed #ffd06055;border-radius:0;"></div>— Covered Promenade</div>
     <div class="legend-item"><div class="legend-box" style="background:none;border:2px dashed #ffd060;border-radius:5px;"></div>🐾 Pet Walk Loop (inner belt · 1.73km)</div>
@@ -3075,7 +3126,7 @@
   const tooltip = document.getElementById('tooltip');
   const amenityColors = {
     'amen-pool':'#00cfff','amen-gym':'#ff7c5c','amen-evening':'#ffd060',
-    'amen-cricket':'#00e87a','amen-lib':'#00cfff','amen-kids-real':'#c47aff',
+    'amen-football':'#00e87a','amen-tennis':'#ffd060','amen-lib':'#00cfff','amen-kids-real':'#c47aff',
     'amen-playground':'#ffd060','amen-club':'#ffd060','amen-senior':'#00e87a',
     'amen-yoga':'#00e87a','amen-amphi':'#c47aff','amen-pet':'#ffd060',
     'amen-berm':'#00e87a','amen-rest5':'#00e87a','amen-rest7':'#00e87a',
@@ -4927,7 +4978,8 @@ const AMEN_ICONS = {
   'amen-amphi':      '🎭',
   'amen-lib':        '📚',
   'amen-playground': '⚽',
-  'amen-cricket':    '🏏',
+  'amen-football':   '⚽',
+  'amen-tennis':     '🎾',
   'amen-runners':    '🏃',
   'amen-pet':        '🐕',
   'amen-rest5':      '🌄',
